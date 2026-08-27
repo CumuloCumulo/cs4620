@@ -60,7 +60,7 @@ export const parts: CoursePart[] = [
     lessons: [
       lesson("a", "introduction", "计算机图形学全景", "Lecture 01", "01intro.pdf", "认识成像、建模、渲染和动画四块版图，以及它们如何组成一张最终图像。", ["成像", "建模", "渲染", "动画"], "选一款游戏或电影镜头，把技术分别归入四块版图。"),
       lesson("b", "triangle-meshes-1", "三角网格 I", "Lecture 02", "02trimesh1.pdf", "用离散三角形逼近连续曲面，理解网格的几何数据与拓扑关系。", ["顶点/边/面", "索引网格", "绕序", "面法线"], "手画一个立方体的三角形索引并检查所有面的朝向。"),
-      lesson("c", "triangle-meshes-2", "三角网格 II", "Lecture 03", "学习 OBJ 编码、属性连续性、顶点法线与基本网格处理。", ["OBJ", "顶点法线", "平滑", "属性接缝"], "读取 OBJ，统计顶点和三角形数量，并重新计算顶点法线。"),
+      lesson("c", "triangle-meshes-2", "三角网格 II", "Lecture 03", "03trimesh2.pdf", "学习 OBJ 编码、属性连续性、顶点法线与基本网格处理。", ["OBJ", "顶点法线", "平滑", "属性接缝"], "读取 OBJ，统计顶点和三角形数量，并重新计算顶点法线。"),
     ],
   },
   {
@@ -167,4 +167,3 @@ export const projects = [
 
 export const allLessons = parts.flatMap((part) => part.lessons.map((item) => ({ ...item, part })));
 export const findPart = (value: string | number) => parts.find((part) => String(part.id) === String(value));
-
