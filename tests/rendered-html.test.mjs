@@ -41,3 +41,13 @@ test("starter preview dependency and files are removed", async () => {
   await assert.rejects(readFile(new URL("../app/_sites-preview/SkeletonPreview.tsx", templateRoot), "utf8"));
 });
 
+test("renders the PDF lectures as narrated tutorials", async () => {
+  const response = await render("/part/1/triangle-meshes-1");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /本讲要回答的问题/);
+  assert.match(html, /课件脉络/);
+  assert.match(html, /讲解补足/);
+  assert.match(html, /lecture-slides\/02trimesh1\/page-005\.webp/);
+  assert.match(html, /对照完整原始课件/);
+});

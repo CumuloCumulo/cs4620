@@ -38,4 +38,5 @@ yarn-error.log*
 /.wrangler/
 /outputs/
 /work/
+/tmp/
 crawl/cornell_cs4620_2018fa/raw/projects_content.html
