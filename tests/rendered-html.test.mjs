@@ -99,6 +99,26 @@ test("renders all 38 ray-intersection pages with camera and intersection derivat
   assert.equal(new Set(html.match(/lecture-slides\/04rt-intersect\/page-\d{3}\.webp/g)).size, 38);
 });
 
+test("renders all 44 perspective pages and preserves four projection animations", async () => {
+  const response = await render("/part/2/perspective");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /同一个三维场景为什么能呈现为工程图、广角照片或移轴建筑照/);
+  assert.match(html, /44(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：同一相机基、两根等高线段、四种投影/);
+  assert.match(html, /在第 7 页基础上新增更远的第二根 y 线段/);
+  assert.match(html, /在第 22 页基础上新增深度更大的第二根 y 线段/);
+  assert.match(html, /在第 33 页基础上新增更远的第二根同高线段/);
+  assert.match(html, /在第 39 页基础上新增更远的同高线段/);
+  assert.match(html, /y'=d·y\/Z/);
+  assert.match(html, /焦距本身不改变固定 viewpoint 下的透视比例/);
+  assert.match(html, /相机上仰时竖线汇聚/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?5/);
+  assert.match(html, /lecture-slides\/05perspective\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/05perspective\/page-044\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/05perspective\/page-\d{3}\.webp/g)).size, 44);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
