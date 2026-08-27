@@ -20,6 +20,18 @@ export type CoursePart = {
   lessons: Lesson[];
 };
 
+export type CourseProject = {
+  id: number;
+  slug: string;
+  title: string;
+  part: number;
+  written: boolean;
+  summary: string;
+  url: string;
+  tasks: string[];
+  deliverables: string[];
+};
+
 const slides = "https://www.cs.cornell.edu/courses/cs4620/2018fa/slides/";
 
 const lesson = (
@@ -155,15 +167,16 @@ export const parts: CoursePart[] = [
   },
 ];
 
-export const projects = [
-  { id: 1, slug: "mesh", title: "Mesh", part: 1, written: false, summary: "生成并处理三角网格、纹理坐标和顶点法线。", url: "https://www.cs.cornell.edu/courses/cs4620/2018fa/#mesh" },
-  { id: 2, slug: "ray1", title: "Ray 1", part: 2, written: true, summary: "从相机射线到求交、着色、阴影与纹理的基础光线追踪器。", url: "https://www.cs.cornell.edu/courses/cs4620/2018fa/#ray1" },
-  { id: 3, slug: "manip", title: "Manipulators", part: 3, written: true, summary: "用反投影射线把二维鼠标输入映射到三维变换。", url: "https://www.cs.cornell.edu/courses/cs4620/2018fa/#manip" },
-  { id: 4, slug: "shaders", title: "Shaders", part: 5, written: true, summary: "实现微表面、环境、位移和凹凸着色。", url: "https://www.cs.cornell.edu/courses/cs4620/2018fa/#shaders" },
-  { id: 5, slug: "splines", title: "Splines", part: 6, written: true, summary: "实现 De Casteljau、Catmull-Rom 转换和旋转曲面。", url: "https://www.cs.cornell.edu/courses/cs4620/2018fa/#splines" },
-  { id: 6, slug: "animation", title: "Animation", part: 8, written: true, summary: "关键帧、层级动画和三维旋转插值。", url: "https://www.cs.cornell.edu/courses/cs4620/2018fa/#animation" },
-  { id: 7, slug: "ray2", title: "Ray 2", part: 10, written: true, summary: "更真实的材质、采样、递归效果与光追加速。", url: "https://www.cs.cornell.edu/courses/cs4620/2018fa/#ray2" },
+export const projects: CourseProject[] = [
+  { id: 1, slug: "mesh", title: "Mesh", part: 1, written: false, summary: "生成并处理三角网格、纹理坐标和顶点法线。", url: "https://www.cs.cornell.edu/courses/cs4620/2018fa/#mesh", tasks: ["实现参数曲面的三角网格生成", "为网格生成一致的索引、UV 与法线", "用极点、接缝和退化三角形测试边界情况"], deliverables: ["可运行的网格程序", "至少三张不同视角的结果图", "一页测试记录；本项目没有书面部分"] },
+  { id: 2, slug: "ray1", title: "Ray 1", part: 2, written: true, summary: "从相机射线到求交、着色、阴影与纹理的基础光线追踪器。", url: "https://www.cs.cornell.edu/courses/cs4620/2018fa/#ray1", tasks: ["生成正交与透视相机射线", "完成球体、三角形和网格求交", "实现 Lambert/Phong 着色、阴影、纹理与镜面反射"], deliverables: ["基础光线追踪器源码", "规定场景与自选场景的渲染结果", "书面题的推导与计算过程"] },
+  { id: 3, slug: "manip", title: "Manipulators", part: 4, written: true, summary: "用反投影射线把二维鼠标输入映射到三维变换。", url: "https://www.cs.cornell.edu/courses/cs4620/2018fa/#manip", tasks: ["把屏幕坐标反投影为世界空间射线", "实现平移、旋转和缩放操纵器", "处理对象、世界与相机坐标之间的变换"], deliverables: ["可交互的三维操纵器", "三个操作各一段可复现演示", "书面题与坐标系说明"] },
+  { id: 4, slug: "shaders", title: "Shaders", part: 5, written: true, summary: "实现微表面、环境、位移和凹凸着色。", url: "https://www.cs.cornell.edu/courses/cs4620/2018fa/#shaders", tasks: ["实现基础与微表面反射着色", "实现环境映射", "实现位移映射和凹凸/法线扰动"], deliverables: ["GLSL 着色器源码", "每种效果的对照结果图", "书面题与参数分析"] },
+  { id: 5, slug: "splines", title: "Splines", part: 7, written: true, summary: "实现 De Casteljau、Catmull-Rom 转换和旋转曲面。", url: "https://www.cs.cornell.edu/courses/cs4620/2018fa/#splines", tasks: ["实现三次 Bézier 的 De Casteljau 求值", "把 Catmull-Rom 样条转换并拼接为 Bézier 段", "旋转二维样条生成三维曲面"], deliverables: ["样条编辑与曲面生成程序", "曲线和旋转曲面结果图", "书面题与连续性分析"] },
+  { id: 6, slug: "animation", title: "Animation", part: 8, written: true, summary: "关键帧、层级动画和三维旋转插值。", url: "https://www.cs.cornell.edu/courses/cs4620/2018fa/#animation", tasks: ["建立层级场景图并传播局部变换", "实现关键帧和时间曲线", "使用四元数与 slerp 插值三维旋转"], deliverables: ["可播放的层级动画", "关键帧与插值方式说明", "书面题和最终演示视频"] },
+  { id: 7, slug: "ray2", title: "Ray 2", part: 11, written: true, summary: "更真实的材质、采样、递归效果与光追加速。", url: "https://www.cs.cornell.edu/courses/cs4620/2018fa/#ray2", tasks: ["加入分布式采样、软阴影或景深等效果", "实现高级材质与递归光线效果", "使用包围盒和 BVH 加速求交并完成抗锯齿"], deliverables: ["扩展后的光线追踪器", "质量、样本数与性能的对照结果", "书面题与最终渲染图"] },
 ];
 
 export const allLessons = parts.flatMap((part) => part.lessons.map((item) => ({ ...item, part })));
 export const findPart = (value: string | number) => parts.find((part) => String(part.id) === String(value));
+export const findProjectForPart = (part: number) => projects.find((project) => project.part === part);

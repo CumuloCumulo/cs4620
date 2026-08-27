@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { findPart, parts } from "../../course-data";
+import { findPart, findProjectForPart, parts } from "../../course-data";
 import { SiteShell } from "../../components/SiteShell";
 
 export function generateStaticParams() { return parts.map((part) => ({ part: String(part.id) })); }
@@ -20,6 +20,8 @@ export default async function PartPage({ params }: { params: Promise<{ part: str
   if (!part) notFound();
   const previous = parts[part.id - 1];
   const next = parts[part.id + 1];
+  const project = findProjectForPart(part.id);
+  const lastLesson = part.lessons.at(-1);
   return (
     <SiteShell>
       <main className="part-page" style={{ "--part-color": part.color } as React.CSSProperties}>
@@ -29,6 +31,7 @@ export default async function PartPage({ params }: { params: Promise<{ part: str
           <div className="part-intro"><p>Part {part.id}</p><h1>{part.title}</h1><p>{part.description}</p>{part.project && <div className="project-chip">关联作业：{part.project}</div>}</div>
           <div className="lesson-arrows">
             {part.lessons.map((item) => <Link href={`/part/${part.id}/${item.slug}`} key={item.slug}><b>{item.code}</b> {item.title}</Link>)}
+            {project && lastLesson && <Link className="assignment-arrow" href={`/part/${part.id}/${lastLesson.slug}#chapter-assignment`}><b>作业</b> PA {project.id}：{project.title}</Link>}
           </div>
         </section>
         <nav className="part-pager" aria-label="部分导航">
@@ -39,4 +42,3 @@ export default async function PartPage({ params }: { params: Promise<{ part: str
     </SiteShell>
   );
 }
-

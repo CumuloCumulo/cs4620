@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { allLessons, findPart, parts } from "../../../course-data";
+import { allLessons, findPart, findProjectForPart } from "../../../course-data";
 import { ProgressButton } from "../../../components/ProgressButton";
 import { SiteShell } from "../../../components/SiteShell";
 
@@ -24,6 +24,8 @@ export default async function LessonPage({ params }: { params: Promise<{ part: s
   const currentIndex = allLessons.findIndex((entry) => entry.part.id === part.id && entry.slug === item.slug);
   const previous = allLessons[currentIndex - 1];
   const next = allLessons[currentIndex + 1];
+  const isLastLesson = part.lessons.at(-1)?.slug === item.slug;
+  const project = isLastLesson ? findProjectForPart(part.id) : undefined;
   return (
     <SiteShell>
       <main className="lesson-page" style={{ "--part-color": part.color } as React.CSSProperties}>
@@ -32,7 +34,7 @@ export default async function LessonPage({ params }: { params: Promise<{ part: s
           <div className="ray-diagram" aria-hidden="true"><span className="ray-line" /><span className="ray-ball">●</span><span className="ray-hit">×</span></div>
         </section>
         <div className="lesson-layout">
-          <aside className="lesson-nav"><strong>Part {part.id}</strong>{part.lessons.map((entry) => <Link className={entry.slug === item.slug ? "active" : ""} href={`/part/${part.id}/${entry.slug}`} key={entry.slug}>{entry.code} {entry.title}</Link>)}</aside>
+          <aside className="lesson-nav"><strong>Part {part.id}</strong>{part.lessons.map((entry) => <Link className={entry.slug === item.slug ? "active" : ""} href={`/part/${part.id}/${entry.slug}`} key={entry.slug}>{entry.code} {entry.title}</Link>)}{project && <a className="assignment-nav" href="#chapter-assignment">作业 PA {project.id}：{project.title}</a>}</aside>
           <article className="lesson-content">
             <div className="lesson-title"><span>{item.code}</span><div><p>{item.lecture || `Part ${part.id}`}</p><h1>{item.title}</h1></div></div>
             <p className="lead">{item.summary}</p>
@@ -54,6 +56,18 @@ export default async function LessonPage({ params }: { params: Promise<{ part: s
             <h2>完成检查</h2>
             <ol className="check-list">{item.checks.map((check) => <li key={check}>{check}</li>)}</ol>
 
+            {project && <section className="chapter-assignment" id="chapter-assignment">
+              <div className="assignment-kicker"><span>章节作业</span><b>PA {project.id}</b></div>
+              <h2>{project.title}</h2>
+              <p className="assignment-lead">{project.summary}</p>
+              <p>像 Full Stack Open 一样，这份作业属于教材正文。请按顺序完成下面的增量任务，每完成一步就运行最小测试并保存一个可复现结果。</p>
+              <h3>任务 {project.id}.1–{project.id}.{project.tasks.length}</h3>
+              <ol className="assignment-tasks">{project.tasks.map((task, index) => <li key={task}><span>{project.id}.{index + 1}</span><div><strong>{task}</strong><p>先写下预期输入和输出，再实现、测试并记录结果。</p></div></li>)}</ol>
+              <h3>完成与提交</h3>
+              <ul className="assignment-deliverables">{project.deliverables.map((deliverable) => <li key={deliverable}>{deliverable}</li>)}</ul>
+              <div className="assignment-note"><strong>{project.written ? "包含书面部分" : "仅编程作业"}</strong><p>原课程使用 2018 年框架与截止日期；自学时不受旧日期限制。需要逐项核对原始接口、测试场景或书面题时，再查阅 <a href={project.url} target="_blank" rel="noreferrer">Cornell 原始作业说明 ↗</a>。</p></div>
+            </section>}
+
             <nav className="lesson-pager" aria-label="课程前后导航">
               {previous ? <Link href={`/part/${previous.part.id}/${previous.slug}`}><small>上一节</small><strong>← {previous.title}</strong></Link> : <span />}
               {next ? <Link href={`/part/${next.part.id}/${next.slug}`} className="next"><small>下一节</small><strong>{next.title} →</strong></Link> : <Link href="/projects" className="next"><small>课程完成</small><strong>查看项目 →</strong></Link>}
@@ -64,4 +78,3 @@ export default async function LessonPage({ params }: { params: Promise<{ part: s
     </SiteShell>
   );
 }
-
