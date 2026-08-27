@@ -1,0 +1,24 @@
+{
+  "entry_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/#mesh",
+  "scope": "Seven assignment fragments loaded by the 2018FA course page and their linked resources",
+  "method": "Static HTTP fragments parsed with lxml; no authentication or browser state",
+  "assignment_fragments": [
+    "a1mesh.html",
+    "a2ray1.html",
+    "a3manip.html",
+    "a4shader.html",
+    "a5splines.html",
+    "a6animation.html",
+    "a7ray2.html"
+  ],
+  "selectors": {
+    "assignment_content": "entire fragment",
+    "assets": "img[src], a[href]"
+  },
+  "canonicalization": "Relative URLs resolved against the 2018FA course root; Cornell-hosted images and PDFs copied locally",
+  "expected_records": 7,
+  "stop_rules": [
+    "stop on access control",
+    "report missing fragment or asset"
+  ]
+}

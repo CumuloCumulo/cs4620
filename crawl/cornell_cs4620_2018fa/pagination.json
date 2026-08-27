@@ -1,0 +1,12 @@
+{
+  "input": "crawl/cornell_cs4620_2018fa/raw/projects_content.html",
+  "current_page": null,
+  "visible_page_numbers": [],
+  "page_urls": [],
+  "next_urls": [],
+  "previous_urls": [],
+  "contiguous_from_page_1": false,
+  "last_page_confirmed": false,
+  "confirmed_total_pages": null,
+  "boundary_evidence": "Pagination boundary is not fully confirmed from this snapshot."
+}

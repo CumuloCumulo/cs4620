@@ -29,6 +29,7 @@ export function SiteHeader() {
         <Link href="/about">关于课程</Link>
         <Link href="/#course">课程内容</Link>
         <Link href="/projects">作业项目</Link>
+        <Link href="/archive">原始资源</Link>
         <Link href="/faq">常见问题</Link>
         <Link className="nav-search" href="/search" aria-label="搜索课程">⌕</Link>
         <button type="button" aria-label="切换明暗主题" onClick={toggleTheme}>{dark ? "◐" : "◑"}</button>
@@ -51,4 +52,3 @@ export function SiteFooter() {
 export function SiteShell({ children }: { children: React.ReactNode }) {
   return <><SiteHeader />{children}<SiteFooter /></>;
 }
-

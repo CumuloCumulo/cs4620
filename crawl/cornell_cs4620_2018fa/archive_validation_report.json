@@ -1,0 +1,19 @@
+{
+  "source": "https://www.cs.cornell.edu/courses/cs4620/2018fa/",
+  "schedule_rows": 46,
+  "assignment_fragments": 7,
+  "assignment_headings": 117,
+  "assignment_images": 24,
+  "assignment_links": 35,
+  "old_exam_links": 40,
+  "book_and_supplement_links": 7,
+  "locally_preserved_assets": 27,
+  "representative_checks": [
+    "schedule slides, demos, materials, readings and assignment milestones",
+    "all seven full assignment fragments",
+    "all assignment images and the shader answer sheet",
+    "old exams and solutions",
+    "textbook and supplemental materials"
+  ],
+  "complete": true
+}

@@ -1,0 +1,134 @@
+{
+  "input": "crawl/cornell_cs4620_2018fa/raw/projects_content.html",
+  "saved_from_url": "",
+  "title": "",
+  "canonical": "",
+  "links": 49,
+  "images": 24,
+  "scripts": 484,
+  "forms": 0,
+  "articles": 0,
+  "json_ld_blocks": 0,
+  "top_classes": [
+    [
+      "mi",
+      1455
+    ],
+    [
+      "mo",
+      1150
+    ],
+    [
+      "mrow",
+      828
+    ],
+    [
+      "MathJax_Preview",
+      478
+    ],
+    [
+      "MathJax",
+      478
+    ],
+    [
+      "math",
+      478
+    ],
+    [
+      "MJX_Assistive_MathML",
+      478
+    ],
+    [
+      "mn",
+      457
+    ],
+    [
+      "msubsup",
+      417
+    ],
+    [
+      "texatom",
+      125
+    ],
+    [
+      "MJX-TeXAtom-ORD",
+      125
+    ],
+    [
+      "mspace",
+      112
+    ],
+    [
+      "mtd",
+      108
+    ],
+    [
+      "MathJax_Display",
+      69
+    ],
+    [
+      "MJX_Assistive_MathML_Block",
+      69
+    ],
+    [
+      "mfrac",
+      67
+    ],
+    [
+      "munderover",
+      18
+    ],
+    [
+      "mtext",
+      17
+    ],
+    [
+      "thumbnails",
+      16
+    ],
+    [
+      "accordion-toggle",
+      14
+    ],
+    [
+      "msup",
+      13
+    ],
+    [
+      "msqrt",
+      11
+    ],
+    [
+      "mtable",
+      9
+    ],
+    [
+      "homework",
+      7
+    ],
+    [
+      "accordion-group",
+      7
+    ],
+    [
+      "accordion-heading",
+      7
+    ],
+    [
+      "accordion-body",
+      7
+    ],
+    [
+      "collapse",
+      7
+    ],
+    [
+      "accordion-inner",
+      7
+    ],
+    [
+      "prettyprint",
+      7
+    ]
+  ]
+}

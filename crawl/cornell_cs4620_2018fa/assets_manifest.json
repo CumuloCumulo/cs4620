@@ -1,0 +1,202 @@
+[
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a1/1.png",
+    "local_path": "public/cornell-assets/images/a1/1.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 1901,
+    "sha256": "9077d1f8970884d0d06492371e7a5bdde112a933e9d4cc9f2e1a2e0afa04e8d9"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a1/a1cylinder-characteristics.png",
+    "local_path": "public/cornell-assets/images/a1/a1cylinder-characteristics.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 183944,
+    "sha256": "beceda744a58de4be8aa0426fc3a3c26e9b89f417c3cf9cf6d63bf61ef3c9ec0"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a1/a1sphere-characteristics-corrected.png",
+    "local_path": "public/cornell-assets/images/a1/a1sphere-characteristics-corrected.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 276744,
+    "sha256": "3c7871598ebe407e383106eac983740f70fbd4e9b01d0704e226cacf89da48fd"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a1/a1torus-characteristics.png",
+    "local_path": "public/cornell-assets/images/a1/a1torus-characteristics.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 85894,
+    "sha256": "ab642f34459b4c0a858ad73797d433d805a2340ee14a30d47abe7076264fd9f7"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a1/die.png",
+    "local_path": "public/cornell-assets/images/a1/die.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 67666,
+    "sha256": "67e4d239f0200b535145b3359e82dd4e33403e49026728ccbf75f2fd5138d850"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a1/texture-example-notorus.png",
+    "local_path": "public/cornell-assets/images/a1/texture-example-notorus.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 503556,
+    "sha256": "905533cbb8b59ff7198a691151e95678bb5afedf2061fd09caf295dcae3748b3"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a3/pointProject.png",
+    "local_path": "public/cornell-assets/images/a3/pointProject.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 66506,
+    "sha256": "bde7d57fb66064584559ab3fc7096baa76114bbf9c6a12cd00fffd8ca9c29fac"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a3/rayGenerate.png",
+    "local_path": "public/cornell-assets/images/a3/rayGenerate.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 161004,
+    "sha256": "e569ee5a0f9c6f966c97d715dcbe1333d33cb2a702f4b82a100d47fe682d332f"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a3/rotation-manipulator.png",
+    "local_path": "public/cornell-assets/images/a3/rotation-manipulator.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 76370,
+    "sha256": "b8676d584b97e367f65fa57be274cbea8ec3e84fbcaccfea7fac9e9801be3e65"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a4/YZprojection.png",
+    "local_path": "public/cornell-assets/images/a4/YZprojection.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 240581,
+    "sha256": "e755f88ce7e6a1ff7ad8d300e347ab00002eb26a6cd1f739ded5d6fd65964534"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a4/a4-written-2-answersheet.pdf",
+    "local_path": "public/cornell-assets/images/a4/a4-written-2-answersheet.pdf",
+    "kind": "pdf",
+    "status": "downloaded",
+    "bytes": 9058,
+    "sha256": "8462ee06290b8074ef5ea5d06f996b3c5668d6bb9f3afff67d5e7ad89c52bde3"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a4/bump_reference_earth_lowres.jpg",
+    "local_path": "public/cornell-assets/images/a4/bump_reference_earth_lowres.jpg",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 93191,
+    "sha256": "4239c6e5930a158ff41406044045e1b90882804b2fee4fa2c789d27bdb995532"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a4/cubemap.png",
+    "local_path": "public/cornell-assets/images/a4/cubemap.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 32013,
+    "sha256": "bfedee16a5ca46e017381c31cb0c8b1255e38b5f4e881d49e198839e62880e32"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a4/displacement_reference_earth.jpg",
+    "local_path": "public/cornell-assets/images/a4/displacement_reference_earth.jpg",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 93099,
+    "sha256": "e11b820e982c27b3b21b0626bdd4e3388a1c86b13e286ebb55557a87649db657"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a4/displacement_reference_square.jpg",
+    "local_path": "public/cornell-assets/images/a4/displacement_reference_square.jpg",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 84722,
+    "sha256": "a2c48f52333bf5daf21c023af29f6ed61e8771906d42344147d13cd113619c59"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a4/draw.png",
+    "local_path": "public/cornell-assets/images/a4/draw.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 25356,
+    "sha256": "7b6d0b117f408a191ce31de1094fff2669963832777bd9de2aea83b0a77ddbe7"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a4/environment_reference.jpg",
+    "local_path": "public/cornell-assets/images/a4/environment_reference.jpg",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 109780,
+    "sha256": "4b684141fc61f368466ffcce092b2aa5ea9aff0173f03d2a82a405a772faefd9"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a4/microfacet_reference.jpg",
+    "local_path": "public/cornell-assets/images/a4/microfacet_reference.jpg",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 47387,
+    "sha256": "f563f95757f19efb848ebe90ad0a0c2b4f8f48d7e584e68b826ea09072abe9c5"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a5/A51.png",
+    "local_path": "public/cornell-assets/images/a5/A51.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 48496,
+    "sha256": "785678aceccf5f33de43c2ba84dd42ff4a8792234626987de843a4c83d5ad13c"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a5/A52.png",
+    "local_path": "public/cornell-assets/images/a5/A52.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 112114,
+    "sha256": "3fbbe8153f49efd8b17d3059b596c7487c08761d289bee88939ea777027bdfd3"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a5/A53.png",
+    "local_path": "public/cornell-assets/images/a5/A53.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 180958,
+    "sha256": "154f48faded57fdb33606fd119a797d7854e77961607abcca59d3a743e28e12a"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a5/A54.png",
+    "local_path": "public/cornell-assets/images/a5/A54.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 14460,
+    "sha256": "18a5cafb26091047b2772e05efb0af55f9b252f65626fff176b9a52569e3b7ab"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a5/A56.png",
+    "local_path": "public/cornell-assets/images/a5/A56.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 59810,
+    "sha256": "5e1a790a97dd6c4d91e98a74d06dfad0e4631985936e51ec950a9892228adb22"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a6/a6anim_fig.png",
+    "local_path": "public/cornell-assets/images/a6/a6anim_fig.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 89263,
+    "sha256": "e01ae5500d5a3b1cc9f210c23f214b380a11c231491106ecf73f3c802aacac44"
+  },
+  {
+    "source_url": "https://www.cs.cornell.edu/courses/cs4620/2018fa/images/a7/ray2.png",
+    "local_path": "public/cornell-assets/images/a7/ray2.png",
+    "kind": "image",
+    "status": "downloaded",
+    "bytes": 29975,
+    "sha256": "e24c0cbee209f356544faa47cd9244d47764e739e9cfb6a69fd7e83704f21f33"
+  }
+]

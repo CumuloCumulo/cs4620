@@ -1,0 +1,15 @@
+{
+  "samples": [
+    "mesh",
+    "ray1",
+    "shaders",
+    "ray2"
+  ],
+  "checks": {
+    "identity": "pass",
+    "full_fragment_body": "pass",
+    "relative_urls_resolved": "pass",
+    "images_bound_to_current_assignment": "pass",
+    "math_delimiters_preserved": "pass"
+  }
+}

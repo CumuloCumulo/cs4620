@@ -1,0 +1,12 @@
+{
+  "expected_assignments": 7,
+  "extracted_assignments": 7,
+  "unique_slugs": 7,
+  "total_headings": 117,
+  "total_images": 24,
+  "total_links": 35,
+  "expected_local_assets": 25,
+  "available_local_assets": 25,
+  "failed_assets": [],
+  "complete": true
+}

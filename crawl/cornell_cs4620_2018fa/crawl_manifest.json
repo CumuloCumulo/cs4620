@@ -1,0 +1,65 @@
+[
+  {
+    "slug": "mesh",
+    "source": "a1mesh.html",
+    "status": "completed",
+    "source_sha256": "ae1163932f5454e9be60f2c5fc2898b98c5069399d3672c78e4bc838be475ba6",
+    "headings": 13,
+    "images": 6,
+    "links": 12
+  },
+  {
+    "slug": "ray1",
+    "source": "a2ray1.html",
+    "status": "completed",
+    "source_sha256": "005de63b131c0fcf02e8cfe57c29848ea2a785391d1ce32c1c265cfe899936c2",
+    "headings": 29,
+    "images": 0,
+    "links": 6
+  },
+  {
+    "slug": "manip",
+    "source": "a3manip.html",
+    "status": "completed",
+    "source_sha256": "58a135bf570fe23fcd690840f9c7fc273bdb692bc1b722a296b3b5d2d77856e4",
+    "headings": 18,
+    "images": 3,
+    "links": 8
+  },
+  {
+    "slug": "shaders",
+    "source": "a4shader.html",
+    "status": "completed",
+    "source_sha256": "22c61e077093f504ed7186f605817dd1ea9513f43fdc572ac8e903d2881ce064",
+    "headings": 13,
+    "images": 8,
+    "links": 6
+  },
+  {
+    "slug": "splines",
+    "source": "a5splines.html",
+    "status": "completed",
+    "source_sha256": "7034b34f2ddc666fb00cdee5838318497b99f1ac088338c3816216987342f257",
+    "headings": 16,
+    "images": 5,
+    "links": 0
+  },
+  {
+    "slug": "animation",
+    "source": "a6animation.html",
+    "status": "completed",
+    "source_sha256": "b29a467bcd9b4fd605d2792cb152167d7ad75a9d4de8cfabc0d7a862e989d445",
+    "headings": 23,
+    "images": 1,
+    "links": 1
+  },
+  {
+    "slug": "ray2",
+    "source": "a7ray2.html",
+    "status": "completed",
+    "source_sha256": "07e5ac737bf8b72db7ea1bd035aa2a46c18a3260a20f97c976af98b6b23821fa",
+    "headings": 5,
+    "images": 1,
+    "links": 2
+  }
+]
