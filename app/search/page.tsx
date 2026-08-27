@@ -1,5 +1,6 @@
 import { allLessons } from "../course-data";
 import { SiteShell } from "../components/SiteShell";
+import { detailedTutorials } from "../detailed-tutorial-data";
 import { textbookCompanions } from "../textbook-data";
 import { textbookChapters, textbookSupplements } from "../textbook-manifest";
 import { readTextbookFile } from "../textbook-source";
@@ -9,8 +10,24 @@ export default async function SearchPage() {
   const lectureItems: SearchItem[] = allLessons.map(({ part, ...item }) => {
     const pdfName = item.pdf?.split("/").pop();
     const textbook = pdfName ? textbookCompanions[pdfName] : undefined;
+    const detailed = pdfName ? detailedTutorials[pdfName] : undefined;
     const textbookTerms = textbook?.points.flatMap((point) => [point.title, point.explanation, point.chapter, point.sections, point.formula ?? ""]) ?? [];
-    return { id: `lecture-${part.id}-${item.slug}`, eyebrow: `PDF 课件版 · Part ${part.id}.${item.code}`, href: `/part/${part.id}/${item.slug}`, title: item.title, summary: item.summary, concepts: [...item.concepts, ...textbookTerms] };
+    const detailedTerms = detailed?.chapters.flatMap((chapter) => [
+      chapter.title,
+      chapter.purpose,
+      chapter.checkpoint,
+      ...chapter.beats.flatMap((slide) => [
+        slide.title,
+        slide.change,
+        ...slide.explanation,
+        ...slide.inspect,
+        slide.formula ?? "",
+        slide.pause ?? "",
+        slide.textbook?.bridge ?? "",
+        ...(slide.example?.lines ?? []),
+      ]),
+    ]) ?? [];
+    return { id: `lecture-${part.id}-${item.slug}`, eyebrow: `PDF 课件版 · Part ${part.id}.${item.code}`, href: `/part/${part.id}/${item.slug}`, title: item.title, summary: item.summary, concepts: [...item.concepts, ...textbookTerms, ...detailedTerms] };
   });
   const chapterItems: SearchItem[] = await Promise.all(textbookChapters.map(async (chapter) => ({
     id: `book-${chapter.number}`, eyebrow: `教材版 · 第 ${chapter.number} 章`, href: `/book/${chapter.number}`, title: chapter.title, summary: chapter.description,

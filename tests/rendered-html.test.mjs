@@ -46,18 +46,19 @@ test("renders the PDF lectures as narrated tutorials", async () => {
   const response = await render("/part/1/triangle-meshes-1");
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /怎样用有限个三角形近似连续曲面/);
-  assert.match(html, /现在应当能够说清楚/);
-  assert.match(html, /小练习/);
-  assert.match(html, /教材衔接/);
-  assert.match(html, /教材知识点/);
-  assert.match(html, /索引网格把共享写进数据/);
-  assert.match(html, /第 12 章 图形数据结构/);
-  assert.match(html, /Fundamentals-Of-Computer-Graphics-5th-CN/);
-  assert.match(html, /lecture-slides\/02trimesh1\/page-005\.webp/);
+  assert.match(html, /怎样把连续曲面变成有限、紧凑、可以查询并且方向一致的三角形数据/);
+  assert.match(html, /40(?:<!-- -->)? 个物理页/);
+  assert.match(html, /相邻页变化/);
+  assert.match(html, /第 19 页新增的箭头/);
+  assert.match(html, /第 37、38 页/);
+  assert.match(html, /贯穿例子：由两个三角形组成的正方形/);
+  assert.match(html, /教材接力/);
+  assert.match(html, /12\.1\.2 索引网格的存储/);
+  assert.match(html, /PAUSE &amp; DO/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?5/);
+  assert.match(html, /lecture-slides\/02trimesh1\/page-001\.webp/);
   assert.match(html, /lecture-slides\/02trimesh1\/page-040\.webp/);
   assert.equal(new Set(html.match(/lecture-slides\/02trimesh1\/page-\d{3}\.webp/g)).size, 40);
-  assert.doesNotMatch(html, /课件脉络|讲解补足/);
   assert.match(html, /对照完整原始课件/);
 });
 
@@ -67,6 +68,8 @@ test("indexes the textbook knowledge points in course search", async () => {
   assert.match(searchPage, /item\.pdf\?\.split\("\/"\)\.pop\(\)/);
   assert.match(searchPage, /textbookCompanions\[pdfName\]/);
   assert.match(searchPage, /point\.title, point\.explanation, point\.chapter/);
+  assert.match(searchPage, /slide\.change/);
+  assert.match(searchPage, /slide\.textbook\?\.bridge/);
   assert.match(textbookData, /索引网格把共享写进数据/);
   assert.match(textbookData, /透视正确插值要撤销投影除法/);
   assert.match(textbookData, /标准误差按平方根速度下降/);
