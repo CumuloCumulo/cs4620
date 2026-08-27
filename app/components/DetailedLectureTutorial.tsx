@@ -126,7 +126,7 @@ export function DetailedLectureTutorialArticle({
 
       <section className="deep-synthesis" id="lecture-recap">
         <span>LECTURE MAP</span>
-        <h2>把 40 页压回一条因果链</h2>
+        <h2>把 {tutorial.pageCount} 页压回一条因果链</h2>
         <ol>{tutorial.synthesis.map((item) => <li key={item}>{item}</li>)}</ol>
       </section>
 

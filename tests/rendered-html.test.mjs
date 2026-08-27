@@ -62,6 +62,23 @@ test("renders the PDF lectures as narrated tutorials", async () => {
   assert.match(html, /对照完整原始课件/);
 });
 
+test("renders all 39 Triangle meshes 2 pages and preserves animation deltas", async () => {
+  const response = await render("/part/1/triangle-meshes-2");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /当索引网格只能告诉我们一个面的三个顶点时/);
+  assert.match(html, /39(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：中心顶点周围的四面扇形/);
+  assert.match(html, /第 21 页只在第 20 页底图上增加四条蓝色弯箭头/);
+  assert.match(html, /新增一条红色竖向双端关系和两条绿色水平关系/);
+  assert.match(html, /把动画冻结为 hl\/hr\/tl\/tr、h\/t、l\/r 字段/);
+  assert.match(html, /pair\(i\) = i \^ 1/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?4/);
+  assert.match(html, /lecture-slides\/03trimesh2\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/03trimesh2\/page-039\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/03trimesh2\/page-\d{3}\.webp/g)).size, 39);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
