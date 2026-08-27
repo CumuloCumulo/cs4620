@@ -119,6 +119,27 @@ test("renders all 44 perspective pages and preserves four projection animations"
   assert.equal(new Set(html.match(/lecture-slides\/05perspective\/page-\d{3}\.webp/g)).size, 44);
 });
 
+test("renders all 58 ray-shading pages and preserves the staged lighting derivations", async () => {
+  const response = await render("/part/2/ray-shading");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /光线已经找到可见点之后/);
+  assert.match(html, /58(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：一个点、一盏灯、两个观察位置/);
+  assert.match(html, /只新增一条从光源中心指向远处采样点的半径线/);
+  assert.match(html, /第 26 页全部保留，并新增第二行/);
+  assert.match(html, /新增 modified Blinn-Phong 名称/);
+  assert.match(html, /第 50 页公式保留，只新增橙色 Facet distribution 标签/);
+  assert.match(html, /新增青色 Fresnel Reflectance 标签/);
+  assert.match(html, /蓝色 G 高亮/);
+  assert.match(html, /空气到玻璃：F0=.*0\.04/);
+  assert.match(html, /intersection record 是解决多返回值的核心结构/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?6/);
+  assert.match(html, /lecture-slides\/06rt-shading\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/06rt-shading\/page-058\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/06rt-shading\/page-\d{3}\.webp/g)).size, 58);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
