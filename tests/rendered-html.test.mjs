@@ -48,9 +48,25 @@ test("renders the PDF lectures as narrated tutorials", async () => {
   assert.match(html, /怎样用有限个三角形近似连续曲面/);
   assert.match(html, /现在应当能够说清楚/);
   assert.match(html, /小练习/);
+  assert.match(html, /教材衔接/);
+  assert.match(html, /教材知识点/);
+  assert.match(html, /索引网格把共享写进数据/);
+  assert.match(html, /第 12 章 图形数据结构/);
+  assert.match(html, /Fundamentals-Of-Computer-Graphics-5th-CN/);
   assert.match(html, /lecture-slides\/02trimesh1\/page-005\.webp/);
   assert.match(html, /lecture-slides\/02trimesh1\/page-040\.webp/);
   assert.equal(new Set(html.match(/lecture-slides\/02trimesh1\/page-\d{3}\.webp/g)).size, 40);
   assert.doesNotMatch(html, /课件脉络|讲解补足/);
   assert.match(html, /对照完整原始课件/);
+});
+
+test("indexes the textbook knowledge points in course search", async () => {
+  const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
+  const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
+  assert.match(searchPage, /item\.pdf\?\.split\("\/"\)\.pop\(\)/);
+  assert.match(searchPage, /textbookCompanions\[pdfName\]/);
+  assert.match(searchPage, /point\.title, point\.explanation, point\.chapter/);
+  assert.match(textbookData, /索引网格把共享写进数据/);
+  assert.match(textbookData, /透视正确插值要撤销投影除法/);
+  assert.match(textbookData, /标准误差按平方根速度下降/);
 });

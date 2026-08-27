@@ -1,4 +1,5 @@
 import type { LectureTutorial } from "../tutorial-data";
+import { textbookCompanions, textbookSourceUrl } from "../textbook-data";
 
 export function LectureTutorialArticle({
   tutorial,
@@ -13,6 +14,7 @@ export function LectureTutorialArticle({
 }) {
   const basePath = process.env.GITHUB_ACTIONS === "true" ? "/cs4620" : "";
   const stem = tutorial.pdf.replace(/\.pdf$/i, "");
+  const textbook = textbookCompanions[tutorial.pdf];
   const seenPages = new Set<number>();
   const sections = tutorial.sections.map((item) => {
     const [first, last = first] = item.pages.split("–").map(Number);
@@ -28,7 +30,14 @@ export function LectureTutorialArticle({
         <p>{tutorial.opening}</p>
       </section>
 
+      {textbook && <aside className="textbook-opening">
+        <span>教材衔接</span>
+        <p>{textbook.intro}</p>
+        <small>以下内容依据《Fundamentals of Computer Graphics》第 5 版知识结构重新讲解，并非原译文转载。</small>
+      </aside>}
+
       {sections.map((item, index) => {
+        const textbookPoints = textbook?.points.filter((point) => point.sectionId === item.id) ?? [];
         const splitAt = Math.ceil(item.pagesToShow.length / 2);
         const firstSlides = item.pagesToShow.slice(0, splitAt);
         const secondSlides = item.pagesToShow.slice(splitAt);
@@ -51,6 +60,16 @@ export function LectureTutorialArticle({
             <div><h2>{item.title}</h2><small>相关课件：第 {item.pages} 页</small></div>
           </header>
           <p>{item.narration}</p>
+          {textbookPoints.length > 0 && <div className="textbook-points">
+            {textbookPoints.map((point) => <article key={`${point.sectionId}-${point.title}`}>
+              <div className="textbook-point-heading"><span>教材知识点</span><h3>{point.title}</h3></div>
+              <p>{point.explanation}</p>
+              {point.formula && <code>{point.formula}</code>}
+              <a href={textbookSourceUrl(point.file)} target="_blank" rel="noreferrer">
+                {point.chapter} · {point.sections} <b>↗</b>
+              </a>
+            </article>)}
+          </div>}
           <div className="tutorial-slides">{renderSlides(firstSlides)}</div>
           <p>{item.inference}</p>
           {secondSlides.length > 0 && <div className="tutorial-slides">{renderSlides(secondSlides)}</div>}

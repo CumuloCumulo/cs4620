@@ -51,15 +51,28 @@
 .lesson-nav .tutorial-side-nav a{padding:5px 0 5px 12px;font-size:11px;line-height:1.4;color:var(--muted);border-left:2px solid transparent}
 .lesson-nav .tutorial-side-nav a:hover{color:var(--fg);border-left-color:var(--part-color)}
 .tutorial-article{margin-top:10px}
-.tutorial-opening{margin:0 0 78px;padding:0 0 42px;border-bottom:1px solid color-mix(in srgb,var(--fg) 35%,transparent)}
+.tutorial-opening{margin:0 0 26px;padding:0 0 42px;border-bottom:1px solid color-mix(in srgb,var(--fg) 35%,transparent)}
 .tutorial-opening p{font-size:18px;line-height:1.8;margin:0 0 20px}
 .tutorial-opening .tutorial-question{font-size:24px;line-height:1.45;font-weight:850;color:var(--fg);text-decoration:underline;text-decoration-color:var(--part-color);text-decoration-thickness:4px;text-underline-offset:7px}
+.textbook-opening{margin:0 0 78px;padding:24px 27px;background:var(--surface);border-left:6px solid var(--part-color)}
+.textbook-opening>span{font:900 11px/1 var(--mono);letter-spacing:.08em;color:var(--muted)}
+.textbook-opening p{font-size:16px;line-height:1.75;margin:14px 0 12px}
+.textbook-opening small{display:block;color:var(--muted);line-height:1.55}
 .tutorial-section{scroll-margin-top:115px;margin:0 0 96px}
 .tutorial-section>header{display:grid;grid-template-columns:42px 1fr;gap:18px;align-items:start;margin-bottom:28px}
 .tutorial-section>header>span{font:800 12px/1.2 var(--mono);color:var(--part-color);padding-top:10px}
 .tutorial-section>header small{display:block;font:600 11px/1.4 var(--mono);color:var(--muted);margin-top:8px}
 .lesson-content .tutorial-section>header h2{font-size:clamp(27px,4vw,36px);line-height:1.15;letter-spacing:-.03em;margin:0}
 .tutorial-section>p{font-size:17px;line-height:1.85;margin:24px 0}
+.textbook-points{display:grid;gap:16px;margin:30px 0 38px}
+.textbook-points article{padding:24px 27px;border:1px solid color-mix(in srgb,var(--fg) 28%,transparent);border-top:5px solid var(--part-color);background:color-mix(in srgb,var(--surface) 70%,transparent)}
+.textbook-point-heading{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+.textbook-point-heading>span{font:900 10px/1 var(--mono);letter-spacing:.08em;color:var(--part-color)}
+.lesson-content .textbook-point-heading h3{font-size:20px;line-height:1.3;margin:0}
+.textbook-points article>p{font-size:15px;line-height:1.75;margin:16px 0}
+.textbook-points code{display:block;overflow-x:auto;padding:14px 16px;background:var(--code);font:600 13px/1.55 var(--mono);white-space:pre-wrap}
+.textbook-points article>a{display:inline-block;margin-top:16px;color:var(--muted);font:700 11px/1.5 var(--mono);text-decoration:underline;text-underline-offset:4px}
+.textbook-points article>a:hover{color:var(--fg)}
 .tutorial-slides{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:32px 0 38px}
 .tutorial-slide{margin:0 0 24px;background:#20211e;border:1px solid color-mix(in srgb,var(--fg) 35%,transparent);padding:11px}
 .tutorial-slide a{display:block}
@@ -81,4 +94,4 @@
 .tutorial-practice small{display:block;border-top:1px solid var(--muted);padding-top:17px;color:var(--muted);line-height:1.5}
 .tutorial-pdf-link{margin-top:0}
 @media(max-width:900px){.tutorial-side-nav{display:none}.tutorial-section{margin-bottom:78px}}
-@media(max-width:600px){.tutorial-opening .tutorial-question{font-size:21px}.tutorial-section>header{grid-template-columns:32px 1fr;gap:10px}.tutorial-slides{grid-template-columns:1fr}.tutorial-slide{margin-left:-24px;margin-right:-24px;padding:7px;border-left:0;border-right:0}.tutorial-keypoints,.tutorial-check,.tutorial-practice{padding:23px 20px}}
+@media(max-width:600px){.tutorial-opening .tutorial-question{font-size:21px}.textbook-opening{padding:22px 20px}.tutorial-section>header{grid-template-columns:32px 1fr;gap:10px}.textbook-points article{padding:21px 20px}.tutorial-slides{grid-template-columns:1fr}.tutorial-slide{margin-left:-24px;margin-right:-24px;padding:7px;border-left:0;border-right:0}.tutorial-keypoints,.tutorial-check,.tutorial-practice{padding:23px 20px}}
