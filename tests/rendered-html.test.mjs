@@ -161,6 +161,26 @@ test("renders all 9 interpolation pages including both physical frames of printe
   assert.equal(new Set(html.match(/lecture-slides\/06\.5rt-interp\/page-\d{3}\.webp/g)).size, 9);
 });
 
+test("renders all 31 texture-mapping pages and preserves map, space, and sampling transitions", async () => {
+  const response = await render("/part/3/texture-basics");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /怎样把一张有限的二维图像变成三维表面上连续、可重复并可过滤的材质属性/);
+  assert.match(html, /31(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：4×3 编号纹理铺到 4×3 米地板/);
+  assert.match(html, /左下新增一张灰度木板图/);
+  assert.match(html, /箭头反向/);
+  assert.match(html, /三个空间/);
+  assert.match(html, /14\.3/);
+  assert.match(html, /安全 repeat 应使用/);
+  assert.match(html, /双线性只解决放大时格点之间的重建/);
+  assert.match(html, /不会在缩小时自动抗混叠/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?5/);
+  assert.match(html, /lecture-slides\/07texture-basics\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/07texture-basics\/page-031\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/07texture-basics\/page-\d{3}\.webp/g)).size, 31);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
