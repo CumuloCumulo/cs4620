@@ -140,6 +140,27 @@ test("renders all 58 ray-shading pages and preserves the staged lighting derivat
   assert.equal(new Set(html.match(/lecture-slides\/06rt-shading\/page-\d{3}\.webp/g)).size, 58);
 });
 
+test("renders all 9 interpolation pages including both physical frames of printed slide 5", async () => {
+  const response = await render("/part/2/interpolation");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /射线命中三角形内部以后/);
+  assert.match(html, /9(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：一个 3-4 直角三角形中的命中点/);
+  assert.match(html, /第 5 个印刷页分成两个动画帧/);
+  assert.match(html, /这是印刷页码 5 的第一物理帧/);
+  assert.match(html, /第 5 个物理页的整条位置轴保留/);
+  assert.match(html, /页脚仍印作 5/);
+  assert.match(html, /uv\(p\)=.*\(1\/4,1\/3\)/);
+  assert.match(html, /normalize\(m\).*\(0\.172,0\.306,0\.936\)/);
+  assert.match(html, /光追权重来自三维命中位置/);
+  assert.match(html, /几何法线维护真实表面朝向/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?3/);
+  assert.match(html, /lecture-slides\/06\.5rt-interp\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/06\.5rt-interp\/page-009\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/06\.5rt-interp\/page-\d{3}\.webp/g)).size, 9);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
