@@ -45,9 +45,12 @@ test("renders the PDF lectures as narrated tutorials", async () => {
   const response = await render("/part/1/triangle-meshes-1");
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /本讲要回答的问题/);
-  assert.match(html, /课件脉络/);
-  assert.match(html, /讲解补足/);
+  assert.match(html, /怎样用有限个三角形近似连续曲面/);
+  assert.match(html, /现在应当能够说清楚/);
+  assert.match(html, /小练习/);
   assert.match(html, /lecture-slides\/02trimesh1\/page-005\.webp/);
+  assert.match(html, /lecture-slides\/02trimesh1\/page-040\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/02trimesh1\/page-\d{3}\.webp/g)).size, 40);
+  assert.doesNotMatch(html, /课件脉络|讲解补足/);
   assert.match(html, /对照完整原始课件/);
 });

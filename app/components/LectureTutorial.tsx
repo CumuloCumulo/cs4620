@@ -13,66 +13,66 @@ export function LectureTutorialArticle({
 }) {
   const basePath = process.env.GITHUB_ACTIONS === "true" ? "/cs4620" : "";
   const stem = tutorial.pdf.replace(/\.pdf$/i, "");
+  const seenPages = new Set<number>();
+  const sections = tutorial.sections.map((item) => {
+    const [first, last = first] = item.pages.split("–").map(Number);
+    const pages = Array.from({ length: last - first + 1 }, (_, index) => first + index)
+      .filter((page) => !seenPages.has(page));
+    pages.forEach((page) => seenPages.add(page));
+    return { ...item, pagesToShow: pages };
+  });
   return (
     <div className="tutorial-article">
-      <section className="tutorial-opening" aria-labelledby="lecture-question">
-        <p className="tutorial-kicker">本讲要回答的问题</p>
-        <h2 id="lecture-question">{tutorial.question}</h2>
+      <section className="tutorial-opening">
+        <p className="tutorial-question">{tutorial.question}</p>
         <p>{tutorial.opening}</p>
-        <div className="tutorial-legend">
-          <p><strong>课件脉络</strong><span>严格按 PDF 的页序、图示和概念组织。</span></p>
-          <p><strong>讲解补足</strong><span>根据前后页推测老师会口头补充的过渡与直觉，不冒充课件原文。</span></p>
-        </div>
       </section>
 
-      <section className="tutorial-route" aria-labelledby="lecture-route">
-        <p className="tutorial-kicker">授课路线</p>
-        <h2 id="lecture-route">这一讲怎样一步步展开</h2>
-        <ol>{tutorial.arc.map((step) => <li key={step}>{step}</li>)}</ol>
-      </section>
-
-      {tutorial.sections.map((item, index) => (
+      {sections.map((item, index) => {
+        const splitAt = Math.ceil(item.pagesToShow.length / 2);
+        const firstSlides = item.pagesToShow.slice(0, splitAt);
+        const secondSlides = item.pagesToShow.slice(splitAt);
+        const renderSlides = (pages: number[]) => pages.map((page) => (
+          <figure className="tutorial-slide" key={page}>
+            <a href={`${basePath}/lecture-slides/${stem}/page-${String(page).padStart(3, "0")}.webp`} target="_blank" rel="noreferrer">
+              <img
+                src={`${basePath}/lecture-slides/${stem}/page-${String(page).padStart(3, "0")}.webp`}
+                alt={`${lecture || "CS4620"} 第 ${page} 页课件`}
+                loading={index === 0 && page === firstSlides[0] ? "eager" : "lazy"}
+              />
+            </a>
+            <figcaption>课件第 {page} 页</figcaption>
+          </figure>
+        ));
+        return (
         <section className="tutorial-section" id={item.id} key={item.id}>
           <header>
             <span>{String(index + 1).padStart(2, "0")}</span>
-            <div><small>课件第 {item.pages} 页</small><h2>{item.title}</h2></div>
+            <div><h2>{item.title}</h2><small>相关课件：第 {item.pages} 页</small></div>
           </header>
-          <div className="tutorial-source-copy">
-            <span>课件脉络</span>
-            <p>{item.narration}</p>
-          </div>
-          <figure className="tutorial-slide">
-            <img
-              src={`${basePath}/lecture-slides/${stem}/page-${String(item.slide).padStart(3, "0")}.webp`}
-              alt={`${lecture || "CS4620"} 第 ${item.slide} 页课件`}
-              loading={index === 0 ? "eager" : "lazy"}
-            />
-            <figcaption>原课件第 {item.slide} 页 · Cornell CS4620 Fall 2018</figcaption>
-          </figure>
-          <div className="tutorial-inference">
-            <span>讲解补足</span>
-            <p>{item.inference}</p>
-          </div>
+          <p>{item.narration}</p>
+          <div className="tutorial-slides">{renderSlides(firstSlides)}</div>
+          <p>{item.inference}</p>
+          {secondSlides.length > 0 && <div className="tutorial-slides">{renderSlides(secondSlides)}</div>}
           <div className="tutorial-keypoints">
-            <strong>听到这里，抓住三点</strong>
+            <strong>现在应当能够说清楚</strong>
             <ul>{item.keyPoints.map((point) => <li key={point}>{point}</li>)}</ul>
           </div>
-          <details className="tutorial-check">
-            <summary>停一下：确认自己真的理解了</summary>
+          <div className="tutorial-check">
+            <strong>小练习 {index + 1}</strong>
             <p>{item.check}</p>
-          </details>
+          </div>
         </section>
-      ))}
+      )})}
 
       <section className="tutorial-recap" id="lecture-recap">
-        <p className="tutorial-kicker">本讲收束</p>
-        <h2>把这些页面串成一句话</h2>
+        <h2>这一讲的主线</h2>
         <p>{tutorial.recap}</p>
       </section>
 
       <section className="tutorial-practice" id="lecture-practice">
-        <span>课后验证</span>
-        <h2>不要停在“好像看懂了”</h2>
+        <span>练习</span>
+        <h2>把概念变成可验证的结果</h2>
         <p>{practice}</p>
         <small>先写下预期结果，再计算或编程；完成后保留一个可重复的测试案例。</small>
       </section>
