@@ -34,7 +34,7 @@ export default async function LessonPage({ params }: { params: Promise<{ part: s
     <SiteShell>
       <main className="lesson-page" style={{ "--part-color": part.color } as React.CSSProperties}>
         <section className="lesson-banner">
-          <div className="crumb-arrows"><Link href="/#course">CS4620</Link><Link href={`/part/${part.id}`}>Part {part.id}</Link><span>{item.title}</span></div>
+          <div className="crumb-arrows"><Link href="/#pdf-track">PDF 课件版</Link><Link href={`/part/${part.id}`}>Part {part.id}</Link><span>{item.title}</span></div>
           <div className="ray-diagram" aria-hidden="true"><span className="ray-line" /><span className="ray-ball">●</span><span className="ray-hit">×</span></div>
         </section>
         <div className="lesson-layout">

@@ -17,7 +17,8 @@ test("server-renders the CS4620 course home", async () => {
   const html = await response.text();
   assert.match(html, /深入浅出/);
   assert.match(html, /计算机图形学/);
-  assert.match(html, /课程内容/);
+  assert.match(html, /教材版/);
+  assert.match(html, /PDF 课件版/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/);
 });
 
@@ -69,4 +70,34 @@ test("indexes the textbook knowledge points in course search", async () => {
   assert.match(textbookData, /索引网格把共享写进数据/);
   assert.match(textbookData, /透视正确插值要撤销投影除法/);
   assert.match(textbookData, /标准误差按平方根速度下降/);
+});
+
+test("renders the complete textbook track and all chapter cards", async () => {
+  const response = await render("/book");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /沿着完整教材/);
+  assert.match(html, /PBR：基于物理的渲染/);
+  assert.match(html, /游戏中的计算机图形学/);
+  assert.match(html, /马尔可夫链与 Metropolis 采样/);
+  assert.equal(new Set(html.match(/href="\/book\/[0-9]+"/g)).size, 23);
+});
+
+test("renders original textbook prose, figures, math, lecture links and placed assignments", async () => {
+  const chapter12 = await render("/book/12");
+  assert.equal(chapter12.status, 200);
+  const meshHtml = await chapter12.text();
+  assert.match(meshHtml, /某些数据结构似乎在图形应用程序中反复出现/);
+  assert.match(meshHtml, /12\.1 三角形网格/);
+  assert.match(meshHtml, /textbook\/pic\/Pasted%20image%2020240321093633\.png/);
+  assert.match(meshHtml, /Lecture 02 · 三角网格 I/);
+  assert.match(meshHtml, /作业 PA[\s\S]*1[\s\S]*Mesh/);
+  assert.match(meshHtml, /Cornell 原题/);
+
+  const chapter15 = await render("/book/15");
+  assert.equal(chapter15.status, 200);
+  const curveHtml = await chapter15.text();
+  assert.match(curveHtml, /15\.6\.4 NURBS/);
+  assert.match(curveHtml, /class="katex/);
+  assert.match(curveHtml, /作业 PA[\s\S]*5[\s\S]*Splines/);
 });

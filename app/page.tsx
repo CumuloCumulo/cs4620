@@ -8,10 +8,10 @@ export default function Home() {
       <main>
         <section className="hero" id="top">
           <div className="hero-copy">
-            <h1>深入浅出<br />计算机图形学</h1>
-            <h2>CS4620 公开课</h2>
-            <Link className="start-button" href="/about">开始课程</Link>
-            <p>从三角网格到光线追踪，从矩阵变换到真实感渲染。沿着 Cornell CS4620 的原始课程顺序，系统完成 26 份讲义与 7 个作业项目。</p>
+            <h1>两条路线<br />学透图形学</h1>
+            <h2>完整教材 × Cornell CS4620</h2>
+            <div className="hero-actions"><Link className="start-button" href="/book">进入教材版</Link><Link className="start-button secondary" href="#pdf-track">进入 PDF 课件版</Link></div>
+            <p>你可以沿着 23 章中文教材系统阅读，也可以跟随 Cornell CS4620 的 26 讲课件学习。两版共享七份原始课程作业，并在对应知识位置互相链接。</p>
           </div>
           <div className="cube-art" aria-label="由三个线框立方体组成的图形学课程图案">
             <div className="cube cube-top"><span>△</span></div>
@@ -20,13 +20,18 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="track-selector" aria-label="选择学习版本">
+          <Link className="track-card textbook-track" href="/book"><span>01</span><small>TEXTBOOK TRACK</small><h2>教材版</h2><p>完整第 1–23 章与六个补充专题。保留原文、公式和插图，按书本顺序系统学习。</p><b>打开教材目录 →</b></Link>
+          <a className="track-card pdf-track" href="#pdf-track"><span>02</span><small>LECTURE TRACK</small><h2>PDF 课件版</h2><p>26 份 Cornell 课件被拆解为带讲解、课件页和小练习的自学教程。</p><b>查看课件路线 ↓</b></a>
+        </section>
+
         <section className="intro-row">
           <div><span className="big-icon">◉</span><h3>零基础路线</h3><p>先补齐向量、矩阵与概率，再进入原课程。</p></div>
           <div><span className="big-icon">⌘</span><h3>边学边做</h3><p>7 个完整作业单元，每一部分都有可验证产出。</p></div>
         </section>
 
-        <section className="course-section" id="course">
-          <div className="section-heading"><p>COURSE CONTENTS</p><h2>课程内容</h2><span>按 12 周路径循序渐进，也可以进入任意 Part 独立学习。</span></div>
+        <section className="course-section" id="pdf-track">
+          <div className="section-heading"><p>PDF LECTURE TRACK</p><h2>课件版</h2><span>沿 Cornell CS4620 原始顺序学习 26 讲；每一页课件都保留在教程中。</span></div>
           <div className="module-grid">
             {parts.map((part) => (
               <Link className="module-card" style={{ background: part.color }} href={`/part/${part.id}`} key={part.id}>
@@ -47,4 +52,3 @@ export default function Home() {
     </SiteShell>
   );
 }
-

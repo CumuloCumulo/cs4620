@@ -26,7 +26,7 @@ export default async function PartPage({ params }: { params: Promise<{ part: str
     <SiteShell>
       <main className="part-page" style={{ "--part-color": part.color } as React.CSSProperties}>
         <section className="part-hero">
-          <div className="crumb-arrows"><Link href="/#course">CS4620</Link><span>Part {part.id}</span></div>
+          <div className="crumb-arrows"><Link href="/#pdf-track">PDF 课件版</Link><span>Part {part.id}</span></div>
           <div className="part-symbol" aria-hidden="true"><span>◯</span><i>↗</i></div>
           <div className="part-intro"><p>Part {part.id}</p><h1>{part.title}</h1><p>{part.description}</p>{part.project && <div className="project-chip">关联作业：{part.project}</div>}</div>
           <div className="lesson-arrows">

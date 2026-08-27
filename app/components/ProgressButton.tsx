@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 
 export function ProgressButton({ lessonId }: { lessonId: string }) {
   const [done, setDone] = useState(false);
-  useEffect(() => { setDone(window.localStorage.getItem(`cs4620:${lessonId}`) === "done"); }, [lessonId]);
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setDone(window.localStorage.getItem(`cs4620:${lessonId}`) === "done"));
+    return () => window.cancelAnimationFrame(frame);
+  }, [lessonId]);
   const toggle = () => {
     const next = !done;
     setDone(next);
@@ -13,4 +16,3 @@ export function ProgressButton({ lessonId }: { lessonId: string }) {
   };
   return <button className={`progress-button ${done ? "done" : ""}`} type="button" onClick={toggle}>{done ? "✓ 已完成" : "标记本节已完成"}</button>;
 }
-
