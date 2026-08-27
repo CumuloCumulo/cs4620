@@ -79,6 +79,26 @@ test("renders all 39 Triangle meshes 2 pages and preserves animation deltas", as
   assert.equal(new Set(html.match(/lecture-slides\/03trimesh2\/page-\d{3}\.webp/g)).size, 39);
 });
 
+test("renders all 38 ray-intersection pages with camera and intersection derivations", async () => {
+  const response = await render("/part/2/ray-intersection");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /怎样从一个像素构造一条三维射线/);
+  assert.match(html, /38(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：一条中央射线、一个近三角形和一个远球/);
+  assert.match(html, /在第 7 页投影图上新增蓝色箭头/);
+  assert.match(html, /新增从光源到命中点的 illumination 箭头/);
+  assert.match(html, /在前两层基础上新增第三个半平面/);
+  assert.match(html, /t=4 或 6/);
+  assert.match(html, /triangle 返回 t=3/);
+  assert.match(html, /u=\(i\+0\.5\)\/nx/);
+  assert.match(html, /课件伪代码本身有两个值得主动检查的笔误/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?5/);
+  assert.match(html, /lecture-slides\/04rt-intersect\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/04rt-intersect\/page-038\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/04rt-intersect\/page-\d{3}\.webp/g)).size, 38);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
