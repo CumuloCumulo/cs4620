@@ -1,4 +1,5 @@
 import { splineCurves } from "./spline-tutorial-data";
+import { subdivision } from "./subdivision-tutorial-data";
 
 export type SlideTextbookLink = {
   chapter: string;
@@ -2935,6 +2936,7 @@ export const detailedTutorials: Record<string, DetailedLectureTutorial> = {
   [textureTechniques.pdf]: textureTechniques,
   [imagesDisplays.pdf]: imagesDisplays,
   [splineCurves.pdf]: splineCurves,
+  [subdivision.pdf]: subdivision,
 };
 
 export function getDetailedTutorialForPdf(pdf?: string) {

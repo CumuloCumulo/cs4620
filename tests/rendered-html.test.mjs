@@ -355,6 +355,25 @@ test("renders all 116 spline pages from parameter curves through swept surfaces"
   assert.equal(new Set(html.match(/lecture-slides\/15spline-curves\/page-\d{3}\.webp/g)).size, 116);
 });
 
+test("renders all 58 subdivision pages from corner cutting through production creases", async () => {
+  const response = await render("/part/7/subdivision");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /怎样只重复局部加权规则/);
+  assert.match(html, /58(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：一条开放折线与一个三角控制多面体/);
+  assert.match(html, /角切割动画第 5 帧/);
+  assert.match(html, /第 14 帧：完整一轮 refined polygon/);
+  assert.match(html, /第 13 帧：直接显示极限曲面/);
+  assert.match(html, /非凡顶点/);
+  assert.match(html, /半锐折痕/);
+  assert.match(html, /Geri’s Game/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?5/);
+  assert.match(html, /lecture-slides\/16subdivision\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/16subdivision\/page-058\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/16subdivision\/page-\d{3}\.webp/g)).size, 58);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
