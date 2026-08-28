@@ -248,6 +248,28 @@ test("renders all 50 rasterization pages and preserves coverage, interpolation, 
   assert.equal(new Set(html.match(/lecture-slides\/10rasterization\/page-\d{3}\.webp/g)).size, 50);
 });
 
+test("renders all 38 pipeline pages and preserves culling, visibility, and shading-frequency transitions", async () => {
+  const response = await render("/part/4/pipeline");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /同一套图形管线怎样通过改变阶段之间传递的数据/);
+  assert.match(html, /38(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：两个重叠三角形与一组曲面法线/);
+  assert.match(html, /背面剔除第 1 帧/);
+  assert.match(html, /动画第 4 帧：用 n 与 v 的夹角/);
+  assert.match(html, /画家动画第 6 帧/);
+  assert.match(html, /遮挡图：画家排序其实是一次拓扑排序/);
+  assert.match(html, /A then B: A 写 0\.30/);
+  assert.match(html, /法线变换第 2 帧/);
+  assert.match(html, /n' = normalize\(\(M⁻¹\)ᵀ n\)/);
+  assert.match(html, /Gouraud 与 per-fragment/);
+  assert.match(html, /minimal: attribute=position/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?4/);
+  assert.match(html, /lecture-slides\/11pipeline\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/11pipeline\/page-038\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/11pipeline\/page-\d{3}\.webp/g)).size, 38);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
