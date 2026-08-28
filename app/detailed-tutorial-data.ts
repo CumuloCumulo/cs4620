@@ -3,6 +3,7 @@ import { subdivision } from "./subdivision-tutorial-data";
 import { sceneGraphs } from "./scene-graph-tutorial-data";
 import { animation } from "./animation-tutorial-data";
 import { surfaceReflection } from "./surface-reflection-tutorial-data";
+import { monteCarlo } from "./monte-carlo-tutorial-data";
 
 export type SlideTextbookLink = {
   chapter: string;
@@ -2943,6 +2944,7 @@ export const detailedTutorials: Record<string, DetailedLectureTutorial> = {
   [sceneGraphs.pdf]: sceneGraphs,
   [animation.pdf]: animation,
   [surfaceReflection.pdf]: surfaceReflection,
+  [monteCarlo.pdf]: monteCarlo,
 };
 
 export function getDetailedTutorialForPdf(pdf?: string) {

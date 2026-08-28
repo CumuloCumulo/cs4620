@@ -436,6 +436,27 @@ test("renders all 37 surface reflection pages from BRDF through the rendering eq
   assert.equal(new Set(html.match(/lecture-slides\/19surface-reflection\/page-\d{3}\.webp/g)).size, 37);
 });
 
+test("renders all 17 Monte Carlo illumination pages from solid angle through importance sampling", async () => {
+  const response = await render("/part/9/monte-carlo");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /渲染方程无法直接解析积分时/);
+  assert.match(html, /17(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：估计一块 Lambert 表面接收的环境光/);
+  assert.match(html, /角度与立体角/);
+  assert.match(html, /单点概率为零/);
+  assert.match(html, /标准差是 σ\/√N/);
+  assert.match(html, /任何覆盖被积函数支持集的 PDF/);
+  assert.match(html, /半球均匀采样：PDF=1(?:<!-- -->)?\/\(2π\)/);
+  assert.match(html, /余弦比例采样/);
+  assert.match(html, /BRDF 比例采样/);
+  assert.match(html, /multiple importance sampling/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?4/);
+  assert.match(html, /lecture-slides\/20monte-carlo\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/20monte-carlo\/page-017\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/20monte-carlo\/page-\d{3}\.webp/g)).size, 17);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
