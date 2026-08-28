@@ -644,7 +644,8 @@ test("renders the complete textbook track and all chapter cards", async () => {
   const response = await render("/book");
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /沿着完整教材/);
+  assert.match(html, /计算机图形学/);
+  assert.match(html, /教材学习阶段/);
   assert.match(html, /PBR：基于物理的渲染/);
   assert.match(html, /游戏中的计算机图形学/);
   assert.match(html, /马尔可夫链与 Metropolis 采样/);
