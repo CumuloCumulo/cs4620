@@ -523,6 +523,27 @@ test("renders all 52 antialiasing pages from pixel coverage through mipmapped te
   assert.equal(new Set(html.match(/lecture-slides\/23antialiasing\/page-\d{3}\.webp/g)).size, 52);
 });
 
+test("renders all 38 compositing pages from binary masks through Porter-Duff operators", async () => {
+  const response = await render("/part/11/compositing");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /一个像素里同时有前景、背景和部分覆盖时/);
+  assert.match(html, /38(?:<!-- -->)? 个物理页/);
+  assert.match(html, /把带细发丝的人像放到建筑前/);
+  assert.match(html, /t=0\.3/);
+  assert.match(html, /二值遮罩动画 3/);
+  assert.match(html, /c′=αc/);
+  assert.match(html, /α_E=1-/);
+  assert.match(html, /结合律证明动画 5/);
+  assert.match(html, /independent coverage assumption/);
+  assert.match(html, /positive correlation/);
+  assert.match(html, /1×2×3×2=12 reasonable choices/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?5/);
+  assert.match(html, /lecture-slides\/24compositing\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/24compositing\/page-038\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/24compositing\/page-\d{3}\.webp/g)).size, 38);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");

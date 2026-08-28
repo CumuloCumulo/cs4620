@@ -7,6 +7,7 @@ import { monteCarlo } from "./monte-carlo-tutorial-data";
 import { advancedRayTracing } from "./advanced-ray-tracing-tutorial-data";
 import { rayAcceleration } from "./ray-acceleration-tutorial-data";
 import { antialiasing } from "./antialiasing-tutorial-data";
+import { compositing } from "./compositing-tutorial-data";
 
 export type SlideTextbookLink = {
   chapter: string;
@@ -2951,6 +2952,7 @@ export const detailedTutorials: Record<string, DetailedLectureTutorial> = {
   [advancedRayTracing.pdf]: advancedRayTracing,
   [rayAcceleration.pdf]: rayAcceleration,
   [antialiasing.pdf]: antialiasing,
+  [compositing.pdf]: compositing,
 };
 
 export function getDetailedTutorialForPdf(pdf?: string) {
