@@ -334,6 +334,27 @@ test("renders all 63 image and display pages from continuous images through tone
   assert.equal(new Set(html.match(/lecture-slides\/14images\/page-\d{3}\.webp/g)).size, 63);
 });
 
+test("renders all 116 spline pages from parameter curves through swept surfaces", async () => {
+  const response = await render("/part/6/spline-curves");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /怎样用少量、直观而局部的控制量/);
+  assert.match(html, /116(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：四点拱形/);
+  assert.match(html, /参数运动第 5 帧/);
+  assert.match(html, /Hermite 到 Bézier 第 1 帧/);
+  assert.match(html, /de Casteljau 递推还自动完成细分/);
+  assert.match(html, /C2 再匹配二阶导数/);
+  assert.match(html, /共线还不够 C1/);
+  assert.match(html, /向心参数化通常更稳健/);
+  assert.match(html, /Cox–de Boor/);
+  assert.match(html, /Frenet 标架可由切向、法向、副法向构造/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?7/);
+  assert.match(html, /lecture-slides\/15spline-curves\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/15spline-curves\/page-116\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/15spline-curves\/page-\d{3}\.webp/g)).size, 116);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");

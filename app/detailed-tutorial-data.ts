@@ -1,3 +1,5 @@
+import { splineCurves } from "./spline-tutorial-data";
+
 export type SlideTextbookLink = {
   chapter: string;
   section: string;
@@ -2932,6 +2934,7 @@ export const detailedTutorials: Record<string, DetailedLectureTutorial> = {
   [openGlGlsl.pdf]: openGlGlsl,
   [textureTechniques.pdf]: textureTechniques,
   [imagesDisplays.pdf]: imagesDisplays,
+  [splineCurves.pdf]: splineCurves,
 };
 
 export function getDetailedTutorialForPdf(pdf?: string) {
