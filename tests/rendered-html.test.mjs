@@ -374,6 +374,25 @@ test("renders all 58 subdivision pages from corner cutting through production cr
   assert.equal(new Set(html.match(/lecture-slides\/16subdivision\/page-\d{3}\.webp/g)).size, 58);
 });
 
+test("renders all 23 scene graph pages from flat lists through DAG traversal", async () => {
+  const response = await render("/part/7/scene-graphs");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /怎样让场景的数据结构直接表达/);
+  assert.match(html, /23(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：房屋、门组与共享窗户/);
+  assert.match(html, /移动门要改 8 个变换/);
+  assert.match(html, /一次修改 DoorGroup/);
+  assert.match(html, /改一个实例位置/);
+  assert.match(html, /改共享叶节点/);
+  assert.match(html, /M_world\(child\)=M_world\(parent\)M_local\(child\)/);
+  assert.match(html, /L' = W_\{newParent\}\^\{-1\} W_\{oldNode\}/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?3/);
+  assert.match(html, /lecture-slides\/17scene-graph\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/17scene-graph\/page-023\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/17scene-graph\/page-\d{3}\.webp/g)).size, 23);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
