@@ -311,6 +311,29 @@ test("renders all 33 advanced texture pages from environment lookup through soli
   assert.equal(new Set(html.match(/lecture-slides\/13textures\/page-\d{3}\.webp/g)).size, 33);
 });
 
+test("renders all 63 image and display pages from continuous images through tone mapping", async () => {
+  const response = await render("/part/5/images-displays");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /一组像素数字怎样穿过采集、存储、量化、传递函数与色调映射/);
+  assert.match(html, /63(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：把线性 18% 灰送到 8 位 sRGB 屏幕/);
+  assert.match(html, /加色显示第 4 帧/);
+  assert.match(html, /量化序列第 8 帧/);
+  assert.match(html, /有序抖动第 2 帧/);
+  assert.match(html, /误差扩散第 2 帧/);
+  assert.match(html, /投影仪实验第 3 帧/);
+  assert.match(html, /原讲义笔误/);
+  assert.match(html, /0\.46136/);
+  assert.match(html, /0\.18116/);
+  assert.match(html, /曝光序列第 3 帧/);
+  assert.match(html, /Ward、Fattal 与 LCIS/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?6/);
+  assert.match(html, /lecture-slides\/14images\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/14images\/page-063\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/14images\/page-\d{3}\.webp/g)).size, 63);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
