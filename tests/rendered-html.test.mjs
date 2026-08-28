@@ -226,6 +226,28 @@ test("renders all 33 viewing pages and explains the complete camera-to-screen ch
   assert.equal(new Set(html.match(/lecture-slides\/09viewing\/page-\d{3}\.webp/g)).size, 33);
 });
 
+test("renders all 50 rasterization pages and preserves coverage, interpolation, and clipping transitions", async () => {
+  const response = await render("/part/4/rasterization");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /怎样把已经投影到屏幕的点、线和三角形/);
+  assert.match(html, /50(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：一个带颜色与 UV 的屏幕三角形/);
+  assert.match(html, /中心线膨胀成垂直于线的有限宽带/);
+  assert.match(html, /紫色带的端盖变成竖直/);
+  assert.match(html, /正文与第 28 页完全相同/);
+  assert.match(html, /第 28、31、36 页内容区域哈希相同/);
+  assert.match(html, /页面明确写 &gt;0，而非 ≥0/);
+  assert.match(html, /top-left 半开规则/);
+  assert.match(html, /三维中点的投影不是屏幕端点中点/);
+  assert.match(html, /u_correct=.*2\/7≈0\.2857/);
+  assert.match(html, /-w≤x≤w、-w≤y≤w、-w≤z≤w/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?7/);
+  assert.match(html, /lecture-slides\/10rasterization\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/10rasterization\/page-050\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/10rasterization\/page-\d{3}\.webp/g)).size, 50);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
