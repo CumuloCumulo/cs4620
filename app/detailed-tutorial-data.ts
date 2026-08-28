@@ -1,3 +1,4 @@
+import { introduction } from "./introduction-tutorial-data";
 import { splineCurves } from "./spline-tutorial-data";
 import { subdivision } from "./subdivision-tutorial-data";
 import { sceneGraphs } from "./scene-graph-tutorial-data";
@@ -2930,6 +2931,7 @@ const imagesDisplays: DetailedLectureTutorial = {
 };
 
 export const detailedTutorials: Record<string, DetailedLectureTutorial> = {
+  [introduction.pdf]: introduction,
   [triangleMeshesOne.pdf]: triangleMeshesOne,
   [triangleMeshesTwo.pdf]: triangleMeshesTwo,
   [rayIntersection.pdf]: rayIntersection,

@@ -62,6 +62,26 @@ test("renders the PDF lectures as narrated tutorials", async () => {
   assert.match(html, /对照完整原始课件/);
 });
 
+test("renders all 82 introduction pages and preserves survey animation evidence", async () => {
+  const response = await render("/part/1/introduction");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /计算机图形学究竟研究什么/);
+  assert.match(html, /82(?:<!-- -->)? 个物理页/);
+  assert.match(html, /拆解一帧有角色、雨水和相机运动的游戏画面/);
+  assert.match(html, /全景答案/);
+  assert.match(html, /抠像动画 3/);
+  assert.match(html, /原 PDF 与第 26 页完全相同/);
+  assert.match(html, /扫描动画 2/);
+  assert.match(html, /云渲染动画 3/);
+  assert.match(html, /半透明动画 3/);
+  assert.match(html, /7 份书面 \+ 7 份编程作业/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?6/);
+  assert.match(html, /lecture-slides\/01intro\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/01intro\/page-082\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/01intro\/page-\d{3}\.webp/g)).size, 82);
+});
+
 test("renders all 39 Triangle meshes 2 pages and preserves animation deltas", async () => {
   const response = await render("/part/1/triangle-meshes-2");
   assert.equal(response.status, 200);
@@ -563,6 +583,48 @@ test("renders all 61 color-science pages from spectra through perceptual spaces"
   assert.match(html, /lecture-slides\/25color\/page-001\.webp/);
   assert.match(html, /lecture-slides\/25color\/page-061\.webp/);
   assert.equal(new Set(html.match(/lecture-slides\/25color\/page-\d{3}\.webp/g)).size, 61);
+});
+
+test("audits every Cornell lecture route for exact physical-page coverage", async () => {
+  const lectures = [
+    ["/part/1/introduction", "01intro", 82],
+    ["/part/1/triangle-meshes-1", "02trimesh1", 40],
+    ["/part/1/triangle-meshes-2", "03trimesh2", 39],
+    ["/part/2/ray-intersection", "04rt-intersect", 38],
+    ["/part/2/perspective", "05perspective", 44],
+    ["/part/2/ray-shading", "06rt-shading", 58],
+    ["/part/2/interpolation", "06.5rt-interp", 9],
+    ["/part/3/texture-basics", "07texture-basics", 31],
+    ["/part/3/transforms", "08transforms", 83],
+    ["/part/3/viewing", "09viewing", 33],
+    ["/part/4/rasterization", "10rasterization", 50],
+    ["/part/4/pipeline", "11pipeline", 38],
+    ["/part/4/opengl-glsl", "12opengl", 14],
+    ["/part/5/texture-techniques", "13textures", 33],
+    ["/part/5/images-displays", "14images", 63],
+    ["/part/6/spline-curves", "15spline-curves", 116],
+    ["/part/7/subdivision", "16subdivision", 58],
+    ["/part/7/scene-graphs", "17scene-graph", 23],
+    ["/part/8/animation", "18animation", 69],
+    ["/part/9/surface-reflection", "19surface-reflection", 37],
+    ["/part/9/monte-carlo", "20monte-carlo", 17],
+    ["/part/10/advanced-ray-tracing", "21adv-rt", 34],
+    ["/part/10/ray-acceleration", "22raytracing-accel", 60],
+    ["/part/11/antialiasing", "23antialiasing", 52],
+    ["/part/11/compositing", "24compositing", 38],
+    ["/part/12/color-science", "25color", 61],
+  ];
+  for (const [path, stem, pageCount] of lectures) {
+    const response = await render(path);
+    assert.equal(response.status, 200, path);
+    const html = await response.text();
+    assert.match(html, new RegExp(`${pageCount}(?:<!-- -->)? 个物理页`), path);
+    const pages = html.match(new RegExp(`lecture-slides/${stem}/page-\\d{3}\\.webp`, "g")) ?? [];
+    assert.ok(pages.length >= pageCount, `${path} rendered image references`);
+    assert.equal(new Set(pages).size, pageCount, `${path} unique physical pages`);
+    assert.match(html, new RegExp(`lecture-slides/${stem}/page-001\\.webp`), `${path} first page`);
+    assert.match(html, new RegExp(`lecture-slides/${stem}/page-${String(pageCount).padStart(3, "0")}\\.webp`), `${path} last page`);
+  }
 });
 
 test("indexes the textbook knowledge points in course search", async () => {
