@@ -2500,6 +2500,151 @@ const pipeline: DetailedLectureTutorial = {
   finalPractice: "实现 PipelineStageLab：同一场景可切换 minimal、painter、z-buffer、Gouraud、per-fragment 五种模式；每种模式都显示 vertex input/output、rasterizer varying、fragment input/output 与 framebuffer channels。必须提供 draw-order 交换、back-face culling、near/far、non-uniform scale、normal weighting 和 specular exponent 控件。测试至少覆盖：双面薄片不能误剔除、painter 循环失败、A/B 两顺序得到相同 z-buffer、near 过小触发精度警告、错误 Mn 与正确 (M⁻¹)ᵀn 的切线点积、Gouraud 漏掉三角形内部高光、插值法线未归一化、以及四套案例的 uniform/attribute/varying 路径。",
 };
 
+const openGlGlsl: DetailedLectureTutorial = {
+  pdf: "12opengl.pdf",
+  pageCount: 14,
+  estimatedTime: "约 2-2.5 小时（含着色器逐行追踪与接口练习）",
+  question: "怎样把上一讲的图形管线真正写成一组 CPU 指令和 GPU 着色器，并准确追踪每类数据从哪里来、在哪里变化、最终写到哪里？",
+  opening: [
+    "第 11 讲已经画出了 application、vertex program、rasterizer、fragment program 和 framebuffer，却还没有回答程序员究竟写什么。本讲把那张概念图落到 OpenGL/WebGL 与 GLSL：CPU 端准备状态、缓冲和一次 draw call，GPU 端则用顶点着色器与片元着色器解释这些数据。",
+    "这份短课件先用 1990 年代与实时海面的视觉反差建立动机，再迅速进入 shader program、数据流和 API 家族。自学时不要把它读成版本名清单；真正的主线是教材第 17 章的三个词：buffer 保存数据，state 决定当前连接，shader 定义可编程计算。",
+    "课件由早期讲义拼合而成：标题页、页脚的 Lecture 11/12 编号并不一致，第 5-9 页还保留 Spring 2017 Lecture 14 页脚。教程按 PDF 的 14 个物理页编号，不把这些排版遗留误当成内容变化。",
+  ],
+  outcomes: [
+    "区分固定功能管线与可编程管线，并指出仍由固定硬件完成的阶段",
+    "说明 CPU/主机、GPU/设备、图形上下文、缓冲、状态与 draw call 的关系",
+    "写出一对最小 WebGL 1 顶点/片元着色器，并解释 attribute、uniform、varying 的生命周期",
+    "逐项追踪一个三角形从顶点缓冲、顶点着色器、光栅插值到帧缓冲的全过程",
+    "解释 shader、shader object、linked program 三个层次，并识别编译、链接和使用阶段",
+    "把课件中的 2018 API 版本表当作历史快照，正确区分 OpenGL、OpenGL ES、WebGL 与 GLSL ES",
+  ],
+  runningExample: {
+    title: "贯穿例子：一组三色三角形如何穿过 WebGL 1",
+    description: "应用上传三个 position 与三个 color，用同一个 uMvp 变换全部顶点。顶点着色器每顶点运行一次，输出裁剪坐标和颜色；固定光栅器生成片元并插值颜色；片元着色器把插值值写入颜色缓冲。后文每页都回到这条数据链。",
+    code: "// vertex shader (WebGL 1 / GLSL ES 1.00)\nattribute vec3 aPosition;\nattribute vec3 aColor;\nuniform mat4 uMvp;\nvarying vec3 vColor;\nvoid main() {\n  gl_Position = uMvp * vec4(aPosition, 1.0);\n  vColor = aColor;\n}\n\n// fragment shader\nprecision mediump float;\nvarying vec3 vColor;\nvoid main() {\n  gl_FragColor = vec4(vColor, 1.0);\n}",
+  },
+  chapters: [
+    {
+      id: "why-programmable-graphics",
+      title: "先看结果差异：图形硬件为什么必须变得可编程",
+      pages: "1-4",
+      purpose: "从历史图像与实时海面建立需求：API 名字不是主角，让开发者能改变每顶点与每片元计算才是质变。",
+      beats: [
+        beat(1, "标题页：这一讲要把 Pipeline 变成可写的程序", "物理第 1 页只有 OpenGL and GLSL 标题；页脚仍印作 Lecture 11，而文件与课程顺序把它列为第 12 讲。", [
+          "把上一讲最后一张 GLSL 数据流图放在脑中：应用提交 triangles、attributes 与 uniforms，顶点程序输出 varying，片元程序输出 color/depth。本讲的目标不是重新背管线，而是给每条箭头找到具体的 API 或语言位置。",
+          "OpenGL 是应用对图形系统发命令的接口；GLSL 是写 GPU 可编程阶段的语言。二者配合，才形成一个能画图的程序。",
+        ], ["标题只出现 OpenGL 与 GLSL", "页脚 Lecture 11 是讲义复用遗留，不表示少了一讲", "14 个物理页都按 PDF 文件顺序处理"], { textbook: book("教材第 17 章", "17.1-17.2 硬件概述", "/book/17/", "教材先区分图形 API、物理 GPU 与可编程管线，正好补上标题页没有展开的硬件背景。"), pause: "先写下 OpenGL 与 GLSL 各自运行在 CPU 端还是 GPU 端。读到第 11 页后再修正成完整数据流。" }),
+
+        beat(2, "25 年前的 OpenGL：图像复杂，但算法选择被固定功能限制", "标题页切到一张 1990 年代风格的室内渲染：积木、反射球、纹理与阴影同时出现。", [
+          "这张图并不是在嘲笑旧画面。它证明固定功能硬件已经能高效组合几何变换、纹理和标准光照；真正的限制是程序员只能调预设参数，很难改写顶点如何变形或片元如何着色。",
+          "观察大球重复而规则的高光和材质：视觉效果来自当时管线允许的功能集合。若想做非标准材质、程序化海浪或屏幕空间效果，仅组合开关就不够。",
+        ], ["室内场景包含纹理、局部光照和反射感", "复杂度不等于可编程性", "此页的 25 years ago 是以 2017/2018 为观察时点"], { textbook: book("教材第 17 章", "17.2 固定功能与可编程管线", "/book/17/", "教材说明旧固定管线把顶点变换、光照和片元处理限制在特定样式；现代管线保留相似阶段但开放计算。") }),
+
+        beat(3, "现代实时图形：目标从预设效果扩展到任意材质与光照近似", "第 2 页历史图像换成 NVIDIA 演示中的高光、阴影和反射场景；页面主动注明该示例实际由 DirectX 渲染。", [
+          "这页用 DirectX 结果说明，课件要谈的是现代 GPU 的能力，不是某个 API 的品牌竞赛。OpenGL 与 DirectX 都能把可编程阶段映射到同类硬件。",
+          "金属高光、地面反射、柔和阴影等效果需要按材质和场景组合多种近似。可编程着色器让开发者决定近似方法；API 负责把数据、状态和程序交给 GPU。",
+        ], ["括号明确写着 rendered with DirectX", "画面用于代表现代 GPU，不是 OpenGL 输出证明", "强反射与复杂光照对应后续自定义片元计算"], { pause: "如果同一 GPU 能运行 OpenGL 与 DirectX 程序，二者更可能是硬件本身，还是通向硬件的接口？" }),
+
+        beat(4, "现代 WebGL：浏览器里的海面仍是同一条 GPU 管线", "桌面演示换成 Alexander Alekseev 的 Seascape；新增 GLSL Sandbox 与 Shadertoy 作为程序化图形例子。", [
+          "海面不是一张静态照片贴到矩形上。典型 shader demo 会为每个片元根据视线、时间和程序化波函数求颜色，展示少量 GLSL 如何产生高密度视觉细节。",
+          "WebGL 把 OpenGL ES 风格接口带到 JavaScript 与浏览器，但计算仍由 GPU 完成。网页负责创建上下文、上传数据和选择程序；着色器负责大规模并行求值。",
+        ], ["海面细节遍布整幅画面，适合逐片元并行", "来源列表把效果连接到 shader 创作社区", "从第 3 页到第 4 页改变的是宿主平台，不是管线原理"], { textbook: book("教材第 17 章", "17.3 异构多处理", "/book/17/", "教材用主机 CPU 与设备 GPU 的区分解释：JavaScript/C++ 是主机程序，着色器是设备程序，数据必须通过上下文与缓冲连接。"), pause: "阶段检查前先回答：海面程序里随时间变化但对一次 draw 内所有顶点相同的 time，应该属于 attribute、uniform 还是 varying？" }),
+      ],
+      checkpoint: "用第 2→4 页写出一条因果链：固定预设为什么不够 → 可编程阶段开放了什么 → WebGL 为什么仍能使用同一类 GPU 能力。",
+    },
+    {
+      id: "from-fixed-functions-to-shader-programs",
+      title: "从固定功能到 Shader Program：把可编程说成精确接口",
+      pages: "5-9",
+      purpose: "确定哪些阶段可写、GLSL 写什么，以及一对 shader 如何编译、链接并在 draw 前成为当前 program。",
+      beats: [
+        beat(5, "What changed 第 1 帧：核心变化是更多阶段可编程，但不是全部", "视觉案例收起为固定功能/现代 GPU 的两行对比；首次直接给出 programmable but not all。", [
+          "旧 GPU 把顶点变换和片元着色硬编码成少数模式；现代 GPU 允许程序员为多个阶段提供小程序。这里的“更多”很重要：光栅化、深度/模板测试、混合等仍常由固定功能块执行。",
+          "可编程与固定功能不是互斥架构，而是一条混合管线。把规则稳定、吞吐量极高的步骤留给硬件，把需要算法自由度的步骤交给 shader。",
+        ], ["25 years ago 与 Now 形成唯一对比", "but not all 防止把 GPU 当通用顺序 CPU", "此页只给原则，下一页才列具体能力"], { textbook: book("教材第 17 章", "17.2 可编程图形硬件", "/book/17/", "教材同样强调基本光栅阶段仍相似，而顶点、片元等计算由程序员控制。") }),
+
+        beat(6, "What changed 第 2 帧：自由度具体落在变换、光照与表面效果", "第 5 页的一句概括被展开为 fixed pipeline 与 programmable hardware 两组能力列表。", [
+          "固定管线只允许用 modelview/projection 矩阵变换顶点、用预设 Phong 风格光照着色。可编程管线则能自定义顶点变形、光照模型、阴影、位移表面、反射和折射近似。",
+          "这些效果并不全在一个 shader 中完成。阴影常需多次绘制和额外纹理；反射可能采样环境图；位移可能发生在顶点或细分阶段。可编程的意义是能重新组织数据与多遍计算。",
+        ], ["fixed 只有两条，programmable 展开为六类", "custom vertex transformation 对应顶点程序", "custom lighting/effects 多数落在片元程序及多 pass 配合"], { pause: "把列表中的 shadows 与 simple reflections 各写成至少需要的一份额外输入，例如 shadow map 或 environment map。" }),
+
+        beat(7, "GLSL：一种面向 GPU 阶段、外形接近 C 的着色语言", "能力清单切到 GLSL 定义、历史和 shader stage 列表；本讲范围限定为 vertex 与 fragment。", [
+          "课件把缩写展开为 Graphics Library Shading Language；更常见、正式的名称是 OpenGL Shading Language。保留原页措辞时应知道两者指向同一种 GLSL，而不是两门语言。",
+          "语言像 C/C++，不等于执行模型像普通 CPU 程序。顶点着色器会对大量顶点独立运行，片元着色器会对大量候选片元独立运行；单次 invocation 通过输入输出与同阶段其他 invocation 隔离。",
+          "课件列出 vertex、tessellation、geometry、fragment、compute 五类阶段，但课程此处只建立最小渲染对：vertex + fragment。Cg 与 HLSL 是历史/平台上的其他着色语言。",
+        ], ["OpenGL 2.0 (2004) 是课件给出的 GLSL 历史节点", "阶段列表不是本讲全部要实现的内容", "语法相似与执行语义相似必须分开"], { textbook: book("教材第 17 章", "17.4 着色器", "/book/17/", "教材把着色器定义为 GPU 上逐顶点或逐片元执行计算的机制，并把并行执行与普通主机代码区分开。") }),
+
+        beat(8, "Shader Program 的最小组成：一个顶点阶段加一个片元阶段", "GLSL 语言概览切到 program 结构：两类小程序分别控制 vertex transformation 与 fragment shading。", [
+          "顶点着色器最不可省的合同是为每个顶点写出裁剪空间 gl_Position；片元着色器则为每个生成的片元给出颜色或丢弃它。固定光栅器位于二者之间，用顶点输出组装图元并插值。",
+          "“shader program”常被口语化使用。更精确地说，vertex shader 与 fragment shader 先各自编译成 shader object，再链接成一个可执行 program；链接阶段会检查顶点输出与片元输入能否对接。",
+        ], ["2 (or more) 指管线可有更多 stage", "vertex 与 fragment 分别位于光栅器两侧", "两段源码不是先后调用的普通函数"], { example: { title: "贯穿例子的两份职责", lines: ["vertex: aPosition + uMvp → gl_Position；aColor → vColor", "fixed rasterizer: 三个顶点的 vColor → 每个片元的插值 vColor", "fragment: vColor → gl_FragColor", "三段执行频率分别是 per-vertex、per-covered-fragment、per-fragment"] } }),
+
+        beat(9, "GLSL Program：先编译与链接，绘制前再选择当前程序", "第 8 页两段组成关系扩展为 program 的生命周期，并强调 draw 前必须指定要使用的 program。", [
+          "CPU 端通常依次完成 create shader、set source、compile、attach、link；链接成功后，在 draw call 前把 program 设为当前状态。后续 draw 使用当前缓冲、属性连接、uniform、纹理与 program。",
+          "课件写着“至少一个 vertex shader 或一个 fragment shader”，这反映早期桌面 OpenGL 的宽泛表述；对本课程使用的 WebGL 1 完整光栅绘制程序，应准备并成功链接一份顶点着色器和一份片元着色器。",
+          "“GPU 同一时间只运行一个 program”应理解为当前绘制状态一次选择一个 linked program；硬件仍会并行运行大量该程序的 invocation，应用也可在不同 draw call 之间切换 program。",
+        ], ["program 是一组一起运行的 shaders", "specify before drawing 把 program 变为 OpenGL 状态", "one program 不等于只运行一个顶点或片元"], { textbook: book("教材第 17 章", "17.5 状态机", "/book/17/", "教材说明 OpenGL 调用会设置持久状态，后续计算读取这些状态；当前 program 正是影响 draw 的状态之一。"), pause: "若链接报错“vColor type mismatch”，应检查 CPU 缓冲、顶点 shader 输出，还是顶点/片元 shader 之间的接口？" }),
+      ],
+      checkpoint: "画出 source → compile shader objects → attach/link program → use program → draw 的顺序；再解释为什么 WebGL 1 的一次普通绘制需要 vertex 与 fragment 两端都存在。",
+    },
+    {
+      id: "map-data-onto-the-pipeline",
+      title: "把代码与数据放回管线：attribute、uniform、varying 各走哪条路",
+      pages: "10-11",
+      purpose: "用两张总图把主机命令、顶点处理、固定光栅、片元处理与 framebuffer 串成一条可逐项调试的数据链。",
+      beats: [
+        beat(10, "管线总览：应用在最上游，用户只看到 framebuffer 的最终图像", "program 生命周期切回第 11 讲的纵向 pipeline overview；you are here 指向 application/command stream。", [
+          "应用创建图形上下文，在 CPU 侧准备缓冲和命令流。vertex processing 把对象顶点变为裁剪/屏幕相关几何；rasterization 把图元展开成 fragments；fragment processing 产生候选颜色；framebuffer 阶段再做深度、模板与混合，最后显示。",
+          "此页复习上一讲，但关注点改变了：第 11 讲问各阶段做什么，本页问 OpenGL 应用怎样从最上游配置它们。command stream 是 API 调用与 draw 提交，不是另一份 shader。",
+        ], ["you are here 指向 application", "紫色横条表示阶段间数据，而非可执行程序", "user sees this 位于 framebuffer image 之后"], { textbook: book("教材第 17 章", "17.3 主机、设备与图形上下文", "/book/17/", "教材解释命令流跨越 CPU/GPU 边界之前，必须建立上下文并把主机数据映射或复制到设备缓冲。"), pause: "在图上标出一次 draw call 发出的位置，并圈出它触发的两个可编程阶段。" }),
+
+        beat(11, "GLSL 数据流图：用贯穿三角形逐箭头追踪一次 draw", "第 10 页抽象阶段图细化为 application、vertex program、rasterizer、fragment program、framebuffer，并新增 attribute/uniform/varying 路径。", [
+          "应用把三个 position/color 记录放入缓冲，并告诉当前 program 如何从每条记录读取 aPosition、aColor；这类每顶点变化的数据就是 attribute。uMvp 在一次绘制的三个顶点间不变，作为 uniform 同时可供 shader 读取。",
+          "vertex shader 运行三次，写三个 gl_Position 与 vColor。固定 rasterizer 根据位置覆盖像素，并用重心坐标插值 vColor。fragment shader 对每个候选片元运行，把插值颜色写入 gl_FragColor；随后深度和混合决定 framebuffer 是否真的更新。",
+          "课件沿用 WebGL 1/旧 GLSL 术语 varying。现代 GLSL 常把跨阶段接口写成 vertex out / fragment in，但概念不变：它是顶点产生、光栅器插值、片元消费的数据。",
+        ], ["attributes 只从 application 进入 vertex program", "uniform 绕过 rasterizer，供一个或多个 shader 直接读取", "varying 在 rasterizer 前后出现并被插值", "fragment 输出 depth/color 到 framebuffer"], { textbook: book("教材第 17 章", "17.4 缓冲、状态与着色器", "/book/17/", "教材的三概念在此一一落位：缓冲保存 attributes，状态连接 program/uniform，shader 处理数据；显示缓冲接收最终像素。"), example: { title: "贯穿三角形的执行计数", lines: ["3 个顶点 → vertex shader 运行 3 次", "假设覆盖 12,000 个片元 → fragment shader 约运行 12,000 次", "uMvp 上传 1 次并被三个顶点读取", "vColor 有 3 个顶点输出，却在约 12,000 个片元位置被插值读取", "深度失败的片元可能不更新颜色缓冲"] } }),
+      ],
+      checkpoint: "不看课件重画第 11 页，并把贯穿例子的 aPosition、aColor、uMvp、vColor、gl_Position、gl_FragColor 放到正确箭头上。",
+    },
+    {
+      id: "api-families-and-course-snapshot",
+      title: "版本与学习环境：把 2018 课程快照和永不过时的概念分开",
+      pages: "12-14",
+      purpose: "区分 OpenGL 家族、WebGL 绑定和着色语言版本，明确本课采用的历史环境，并建立按问题类型选择资料的方法。",
+      beats: [
+        beat(12, "OpenGL、OpenGL ES、WebGL 与 GLSL：四个名字不在同一层", "数据流图切到 2017/2018 版本表，列出桌面 OpenGL、移动 OpenGL ES、浏览器 WebGL 与 GLSL 的当时版本。", [
+          "OpenGL 与 OpenGL ES 是面向不同平台/能力集合的图形 API；WebGL 是浏览器 JavaScript 可调用的接口，设计上对应 OpenGL ES 的能力；GLSL/GLSL ES 则是这些 API 使用的着色语言。不要把 API 版本号和语言版本号按数字强行一一对应。",
+          "页上的 OpenGL 4.5、ES 3.2、WebGL 1/2 是课程制作时的快照，不应当作今天的最新版声明。对完成 2018 作业最重要的是识别它选定 WebGL 1，并按照随附代码与规范语法工作。",
+        ], ["desktop/server、mobile、browser 是三类宿主环境", "WebGL 1 关联 ES 2，WebGL 2 关联 ES 3 的能力模型", "GLSL numbers don't always correspond 是本页最耐久的提醒"], { textbook: book("教材第 17 章", "17.3.1 OpenGL 编程", "/book/17/", "教材以 OpenGL 3.3 Core 为另一个教学快照，说明课程版本选择服务于概念与兼容性，不等于追逐最新编号。"), pause: "给四个名字各写一个类型标签：API、嵌入式 API、浏览器绑定、着色语言。" }),
+
+        beat(13, "本课程的具体选择：WebGL 1 + three.js，但目标是理解其下层机制", "版本表收束到课程配置：浏览器、WebGL 1、three.js，以及“不必直接写 three.js，但应理解它”的定位。", [
+          "WebGL 1 提供浏览器中的 OpenGL ES 2.0 风格可编程管线；three.js 在其上封装矩阵、场景图、资源与便利操作。作业代码可能通过 three.js 管理浏览器侧对象，但 shader 的 attribute/uniform/varying 数据流仍遵循第 11 页。",
+          "课件写作“GLSL 1.2”，这里需要技术校正：WebGL 1 的规范着色语言是 GLSL ES 1.00，而不是桌面 GLSL 1.20。二者有相近的旧式 attribute/varying 语法，但片元精度限定等细节不同；本教程贯穿代码按 GLSL ES 1.00 写。",
+          "浏览器推荐是 2018 课程运行环境提示，不是概念前提。真正应保留的调试顺序是：上下文是否建立、shader 是否编译/链接、attribute 是否连接、uniform 是否设置、draw 与 framebuffer 状态是否正确。",
+        ], ["We will use WebGL 1 是课程约束", "three.js 位于 Browser side，不替代 GPU shader", "GLSL 1.2 一句需按 GLSL ES 1.00 校正"], { textbook: book("教材第 17 章", "17.3 图形上下文与高级框架", "/book/17/", "教材说明高级框架能隐藏窗口系统和上下文样板，但不能改变 CPU/GPU 分离、缓冲和状态的底层事实。"), example: { title: "从 three.js 调用追到 GPU", lines: ["BufferGeometry attribute → GPU vertex buffer / attribute", "material matrix or parameter → uniform", "material shader source → linked GPU program", "renderer.render(...) → 一系列状态设置与 draw calls", "WebGL framebuffer → canvas 显示"] } }),
+
+        beat(14, "参考资料不是平铺链接：按层次选择才不会迷路", "课程配置页切到书籍、教程、MDN 与 Khronos 规范清单；这是本讲最后一页。", [
+          "学习概念与推导时，先回到本站教材第 17 章和第 9 章；学习 WebGL 调用顺序时用 WebGL Fundamentals 或 MDN；查精确语法、限制和版本差异时再看 Khronos 规范与 reference card。不同资料回答的问题不同。",
+          "课件列出的 classic book、Lighthouse3D GLSL 1.2 等具有历史语境，适合解释旧式 OpenGL/GLSL 代码；遇到 attribute、varying、gl_FragColor 时，应先确认资料针对 desktop GLSL、GLSL ES 1.00 还是现代 GLSL，避免混用语法。",
+          "到此 14 页完成的是“接口地图”，不是着色器技巧大全。下一步应亲手让一个三角形跑通，再逐次只改一个变量：颜色 attribute、矩阵 uniform、插值 varying。这样每次故障都能定位到一条箭头。",
+        ], ["教程、API 文档、规范分属不同深度", "版本匹配比资料名气更重要", "最后一页把学习路径交回可运行的最小实验"], { textbook: book("教材第 17 章", "17.4-17.5 缓冲、状态与着色器", "/book/17/", "先用教材建立稳定心智模型，再用 API 文档补调用细节，可以避免把状态机错误误判为着色数学错误。"), pause: "结束前合上课件，按“缓冲→状态→着色器→光栅器→帧缓冲”复述贯穿三角形；任何说不清的箭头都回到第 11 页。" }),
+      ],
+      checkpoint: "解释为什么 WebGL 不是 GLSL、three.js 不是 GPU、版本号不能直接互换；再为概念、调用、规范三类问题各选一种资料。",
+    },
+  ],
+  synthesis: [
+    "职责层：OpenGL/WebGL 是应用向图形系统提交资源、状态和命令的 API；GLSL 是可编程 GPU 阶段的语言。",
+    "硬件层：CPU 主机创建上下文并组织 draw；GPU 设备并行处理大量顶点和片元，二者通过缓冲与命令连接。",
+    "程序层：shader source 分别编译为对象，再链接成 program；一次 draw 使用当前 program，但会并行启动许多 invocation。",
+    "数据层：attribute 每顶点读取，uniform 在一次 draw 中共享，varying 由顶点产生并经固定光栅器插值后交给片元阶段。",
+    "固定层：可编程不等于所有阶段任意化；图元装配、光栅化、深度/模板和混合仍大量依赖固定功能状态。",
+    "状态层：program、buffer binding、attribute layout、uniform、texture 与 framebuffer 都参与一次 draw；遗漏任一连接都可能得到空白画面。",
+    "版本层：2018 课程用 WebGL 1 与旧式 GLSL ES 语法；读取资料时必须先核对 API 与语言版本，尤其不要混用 GLSL 1.20 和 GLSL ES 1.00。",
+    "学习层：先用教材建立 buffer/state/shader 模型，再用最小三角形验证，最后才逐步加入矩阵、光照、纹理和多 pass 效果。",
+  ],
+  finalPractice: "实现 ShaderPathLab：在同一页面显示 CPU 侧顶点数组、当前 program 状态、顶点着色器、光栅插值结果、片元着色器和 framebuffer 六栏。先画贯穿三色三角形，再提供开关逐项制造错误：未绑定 position、color stride 错误、uMvp 未设置、vertex/fragment varying 类型不匹配、片元 precision 缺失、program 未 use、深度未清除。每个错误必须显示它阻断了第 11 页的哪条箭头；最后再把 WebGL 1 的 attribute/varying/gl_FragColor 版本改写为 WebGL 2 的 in/out/显式 fragment output，并记录两版概念上不变的部分。",
+};
+
 export const detailedTutorials: Record<string, DetailedLectureTutorial> = {
   [triangleMeshesOne.pdf]: triangleMeshesOne,
   [triangleMeshesTwo.pdf]: triangleMeshesTwo,
@@ -2512,6 +2657,7 @@ export const detailedTutorials: Record<string, DetailedLectureTutorial> = {
   [viewing.pdf]: viewing,
   [rasterization.pdf]: rasterization,
   [pipeline.pdf]: pipeline,
+  [openGlGlsl.pdf]: openGlGlsl,
 };
 
 export function getDetailedTutorialForPdf(pdf?: string) {

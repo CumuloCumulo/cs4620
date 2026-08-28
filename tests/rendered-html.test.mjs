@@ -270,6 +270,26 @@ test("renders all 38 pipeline pages and preserves culling, visibility, and shadi
   assert.equal(new Set(html.match(/lecture-slides\/11pipeline\/page-\d{3}\.webp/g)).size, 38);
 });
 
+test("renders all 14 OpenGL and GLSL pages with the complete host-to-GPU data path", async () => {
+  const response = await render("/part/4/opengl-glsl");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /怎样把上一讲的图形管线真正写成一组 CPU 指令和 GPU 着色器/);
+  assert.match(html, /14(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：一组三色三角形如何穿过 WebGL 1/);
+  assert.match(html, /页脚 Lecture 11 是讲义复用遗留/);
+  assert.match(html, /rendered with DirectX/);
+  assert.match(html, /固定功能与可编程/);
+  assert.match(html, /source → compile shader objects/);
+  assert.match(html, /3 个顶点 → vertex shader 运行 3 次/);
+  assert.match(html, /WebGL 1 的规范着色语言是 GLSL ES 1\.00/);
+  assert.match(html, /BufferGeometry attribute → GPU vertex buffer/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?4/);
+  assert.match(html, /lecture-slides\/12opengl\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/12opengl\/page-014\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/12opengl\/page-\d{3}\.webp/g)).size, 14);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
