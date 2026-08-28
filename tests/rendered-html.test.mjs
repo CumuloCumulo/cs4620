@@ -412,6 +412,30 @@ test("renders all 69 animation pages from timing through motion capture", async 
   assert.equal(new Set(html.match(/lecture-slides\/18animation\/page-\d{3}\.webp/g)).size, 69);
 });
 
+test("renders all 37 surface reflection pages from BRDF through the rendering equation", async () => {
+  const response = await render("/part/9/surface-reflection");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /一束光到达真实表面后/);
+  assert.match(html, /37(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：一颗粗糙度可调的玻璃珠/);
+  assert.match(html, /互易性：交换光源与相机/);
+  assert.match(html, /精确 Fresnel：先算两种偏振振幅/);
+  assert.match(html, /一杯水为什么出现许多边界影像/);
+  assert.match(html, /单位检查：irradiance、radiance、BRDF/);
+  assert.match(html, /BRDF 与 BSDF/);
+  assert.match(html, /F：每个可见微面反射多少/);
+  assert.match(html, /D：有多少微面正好朝向 h/);
+  assert.match(html, /G：合适朝向的微面也可能被邻居挡住/);
+  assert.match(html, /Beckmann 分布/);
+  assert.match(html, /有限小光源：先写成带立体角的求和/);
+  assert.match(html, /取极限：渲染方程的表面反射积分/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?5/);
+  assert.match(html, /lecture-slides\/19surface-reflection\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/19surface-reflection\/page-037\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/19surface-reflection\/page-\d{3}\.webp/g)).size, 37);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
