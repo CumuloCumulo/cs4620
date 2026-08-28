@@ -6,6 +6,7 @@ import { surfaceReflection } from "./surface-reflection-tutorial-data";
 import { monteCarlo } from "./monte-carlo-tutorial-data";
 import { advancedRayTracing } from "./advanced-ray-tracing-tutorial-data";
 import { rayAcceleration } from "./ray-acceleration-tutorial-data";
+import { antialiasing } from "./antialiasing-tutorial-data";
 
 export type SlideTextbookLink = {
   chapter: string;
@@ -2949,6 +2950,7 @@ export const detailedTutorials: Record<string, DetailedLectureTutorial> = {
   [monteCarlo.pdf]: monteCarlo,
   [advancedRayTracing.pdf]: advancedRayTracing,
   [rayAcceleration.pdf]: rayAcceleration,
+  [antialiasing.pdf]: antialiasing,
 };
 
 export function getDetailedTutorialForPdf(pdf?: string) {

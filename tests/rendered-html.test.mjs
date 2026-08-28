@@ -502,6 +502,27 @@ test("renders all 60 ray-acceleration pages from local-space instances through s
   assert.equal(new Set(html.match(/lecture-slides\/22raytracing-accel\/page-\d{3}\.webp/g)).size, 60);
 });
 
+test("renders all 52 antialiasing pages from pixel coverage through mipmapped texture filtering", async () => {
+  const response = await render("/part/11/antialiasing");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /为什么增加像素或样本有时仍消不掉锯齿和摩尔纹/);
+  assert.match(html, /52(?:<!-- -->)? 个物理页/);
+  assert.match(html, /一条斜线、两个球和向远处延伸的网格纹理/);
+  assert.match(html, /点采样动画 2/);
+  assert.match(html, /加权超采样动画 2/);
+  assert.match(html, /dx\+0\.5/);
+  assert.match(html, /Supersampling 与 multisampling/);
+  assert.match(html, /Jacobian/);
+  assert.match(html, /相邻页新增左层四邻居/);
+  assert.match(html, /4N\/3/);
+  assert.match(html, /各向异性误差/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?5/);
+  assert.match(html, /lecture-slides\/23antialiasing\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/23antialiasing\/page-052\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/23antialiasing\/page-\d{3}\.webp/g)).size, 52);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
