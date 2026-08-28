@@ -1,6 +1,7 @@
 import { splineCurves } from "./spline-tutorial-data";
 import { subdivision } from "./subdivision-tutorial-data";
 import { sceneGraphs } from "./scene-graph-tutorial-data";
+import { animation } from "./animation-tutorial-data";
 
 export type SlideTextbookLink = {
   chapter: string;
@@ -2939,6 +2940,7 @@ export const detailedTutorials: Record<string, DetailedLectureTutorial> = {
   [splineCurves.pdf]: splineCurves,
   [subdivision.pdf]: subdivision,
   [sceneGraphs.pdf]: sceneGraphs,
+  [animation.pdf]: animation,
 };
 
 export function getDetailedTutorialForPdf(pdf?: string) {

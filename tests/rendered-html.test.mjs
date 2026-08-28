@@ -393,6 +393,25 @@ test("renders all 23 scene graph pages from flat lists through DAG traversal", a
   assert.equal(new Set(html.match(/lecture-slides\/17scene-graph\/page-\d{3}\.webp/g)).size, 23);
 });
 
+test("renders all 69 animation pages from timing through motion capture", async () => {
+  const response = await render("/part/8/animation");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /怎样把动画师的意图变成随时间变化的少量参数/);
+  assert.match(html, /69(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：让 Luxo 台灯看见球、蓄力并跳过去/);
+  assert.match(html, /Timing 重复物理页/);
+  assert.match(html, /矩阵线性插值的失败/);
+  assert.match(html, /SLERP 推导第 3 帧/);
+  assert.match(html, /q=\(cos\(θ\/2\), â sin\(θ\/2\)\)/);
+  assert.match(html, /W_jB_j⁻¹/);
+  assert.match(html, /识别→标定→逐帧 IK/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?6/);
+  assert.match(html, /lecture-slides\/18animation\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/18animation\/page-069\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/18animation\/page-\d{3}\.webp/g)).size, 69);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
