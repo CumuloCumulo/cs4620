@@ -8,6 +8,7 @@ import { advancedRayTracing } from "./advanced-ray-tracing-tutorial-data";
 import { rayAcceleration } from "./ray-acceleration-tutorial-data";
 import { antialiasing } from "./antialiasing-tutorial-data";
 import { compositing } from "./compositing-tutorial-data";
+import { colorScience } from "./color-science-tutorial-data";
 
 export type SlideTextbookLink = {
   chapter: string;
@@ -2953,6 +2954,7 @@ export const detailedTutorials: Record<string, DetailedLectureTutorial> = {
   [rayAcceleration.pdf]: rayAcceleration,
   [antialiasing.pdf]: antialiasing,
   [compositing.pdf]: compositing,
+  [colorScience.pdf]: colorScience,
 };
 
 export function getDetailedTutorialForPdf(pdf?: string) {

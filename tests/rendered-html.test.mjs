@@ -544,6 +544,27 @@ test("renders all 38 compositing pages from binary masks through Porter-Duff ope
   assert.equal(new Set(html.match(/lecture-slides\/24compositing\/page-\d{3}\.webp/g)).size, 38);
 });
 
+test("renders all 61 color-science pages from spectra through perceptual spaces", async () => {
+  const response = await render("/part/12/color-science");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /光本来是波长上的连续能量分布/);
+  assert.match(html, /61(?:<!-- -->)? 个物理页/);
+  assert.match(html, /把一个苹果的测量光谱重现在 sRGB 显示器上/);
+  assert.match(html, /X=∫n\(λ\)p\(λ\)dλ/);
+  assert.match(html, /大脑动画 4/);
+  assert.match(html, /异谱同色/);
+  assert.match(html, /C=\(M_SMLM_RGB\)⁻¹M_SMLs/);
+  assert.match(html, /s_reflected\(λ\)=e\(λ\)ρ\(λ\)/);
+  assert.match(html, /XYZ 是所有标准色彩空间之间/);
+  assert.match(html, /intentional blank gray field/);
+  assert.match(html, /Lab 转换必须声明参考白/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?5/);
+  assert.match(html, /lecture-slides\/25color\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/25color\/page-061\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/25color\/page-\d{3}\.webp/g)).size, 61);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
