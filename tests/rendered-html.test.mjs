@@ -480,6 +480,28 @@ test("renders all 34 advanced ray tracing pages from one-sample artifacts throug
   assert.equal(new Set(html.match(/lecture-slides\/21adv-rt\/page-\d{3}\.webp/g)).size, 34);
 });
 
+test("renders all 60 ray-acceleration pages from local-space instances through spatial subdivision", async () => {
+  const response = await render("/part/10/ray-acceleration");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /怎样在不改变任何命中结果的前提下/);
+  assert.match(html, /60(?:<!-- -->)? 个物理页/);
+  assert.match(html, /四个车轮实例与十个三角形/);
+  assert.match(html, /inverse-transpose/);
+  assert.match(html, /方向不要重新单位化/);
+  assert.match(html, /构建帧 4/);
+  assert.match(html, /遍历帧 10/);
+  assert.match(html, /t_enter=max/);
+  assert.match(html, /dx=-0/);
+  assert.match(html, /surface area heuristic/);
+  assert.match(html, /3D DDA/);
+  assert.match(html, /k-d tree 动画 3/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?6/);
+  assert.match(html, /lecture-slides\/22raytracing-accel\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/22raytracing-accel\/page-060\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/22raytracing-accel\/page-\d{3}\.webp/g)).size, 60);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
