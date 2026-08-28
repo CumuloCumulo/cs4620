@@ -181,6 +181,30 @@ test("renders all 31 texture-mapping pages and preserves map, space, and samplin
   assert.equal(new Set(html.match(/lecture-slides\/07texture-basics\/page-\d{3}\.webp/g)).size, 31);
 });
 
+test("renders all 83 transformation pages and preserves every animation frame and semantic vector rule", async () => {
+  const response = await render("/part/3/transforms");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /怎样用同一套矩阵机制可靠地移动几何、组合操作、改变坐标系/);
+  assert.match(html, /83(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：一个点、一条切线、一条法线和一个局部框架/);
+  assert.match(html, /参数式前向套 T，隐式查询先套 T⁻¹/);
+  assert.match(html, /三维平移动画第 4 帧/);
+  assert.match(html, /最终画面共有四个立方体/);
+  assert.match(html, /欧拉角第 2 个物理页：与第 44 页像素级完全相同/);
+  assert.match(html, /两页渲染文件哈希一致/);
+  assert.match(html, /旋转与平移对照第 3 帧/);
+  assert.match(html, /沿任意轴缩放第 6 帧/);
+  assert.match(html, /唯一视觉变化是右侧椭圆的法线方向/);
+  assert.match(html, /错误 Mn=.*点积=3/);
+  assert.match(html, /正确 \(M⁻¹\)ᵀn=.*点积=0/);
+  assert.match(html, /T_canonical = F T_frame F⁻¹/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?7/);
+  assert.match(html, /lecture-slides\/08transforms\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/08transforms\/page-083\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/08transforms\/page-\d{3}\.webp/g)).size, 83);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
