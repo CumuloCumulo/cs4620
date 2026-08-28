@@ -457,6 +457,29 @@ test("renders all 17 Monte Carlo illumination pages from solid angle through imp
   assert.equal(new Set(html.match(/lecture-slides\/20monte-carlo\/page-\d{3}\.webp/g)).size, 17);
 });
 
+test("renders all 34 advanced ray tracing pages from one-sample artifacts through distributed rays", async () => {
+  const response = await render("/part/10/advanced-ray-tracing");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /为什么基础光线追踪总显得过分锐利/);
+  assert.match(html, /34(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：一本书、矩形灯与薄透镜相机/);
+  assert.match(html, /标题页编号有误/);
+  assert.match(html, /五种不连续/);
+  assert.match(html, /面积光为何出现部分可见的半影/);
+  assert.match(html, /有限孔径：只在焦平面相交/);
+  assert.match(html, /均匀采样面积光/);
+  assert.match(html, /p_ω\(ω\)=p_A\(y\)/);
+  assert.match(html, /BRDF 采样与环境采样/);
+  assert.match(html, /课件第 30 页标签左右写反/);
+  assert.match(html, /environment\.sample/);
+  assert.match(html, /Ray\.time 必须贯穿/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?5/);
+  assert.match(html, /lecture-slides\/21adv-rt\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/21adv-rt\/page-034\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/21adv-rt\/page-\d{3}\.webp/g)).size, 34);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
