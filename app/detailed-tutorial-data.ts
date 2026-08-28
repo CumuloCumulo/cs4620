@@ -2645,6 +2645,123 @@ const openGlGlsl: DetailedLectureTutorial = {
   finalPractice: "实现 ShaderPathLab：在同一页面显示 CPU 侧顶点数组、当前 program 状态、顶点着色器、光栅插值结果、片元着色器和 framebuffer 六栏。先画贯穿三色三角形，再提供开关逐项制造错误：未绑定 position、color stride 错误、uMvp 未设置、vertex/fragment varying 类型不匹配、片元 precision 缺失、program 未 use、深度未清除。每个错误必须显示它阻断了第 11 页的哪条箭头；最后再把 WebGL 1 的 attribute/varying/gl_FragColor 版本改写为 WebGL 2 的 in/out/显式 fragment output，并记录两版概念上不变的部分。",
 };
 
+const textureTechniques: DetailedLectureTutorial = {
+  pdf: "13textures.pdf",
+  pageCount: 33,
+  estimatedTime: "约 3.5-4 小时（含方向映射、位移微分与切线空间练习）",
+  question: "当纹理不再只是表面颜色时，怎样用同一种‘在表面上定义函数’的机制表达环境、真实几何起伏、伪凹凸、法线场和实体材料？",
+  opening: [
+    "第 07 讲把纹理当作二维图像，第 13 讲故意打破这个狭窄印象：纹理真正提供的是可采样函数。输入可以是表面坐标、空间方向或三维位置，输出也可以是颜色、高度、法线甚至任意着色参数。",
+    "课件先用环境贴图把‘表面位置→颜色’改成‘方向→颜色’，再用一张高度图逐级得到 displacement、bump 与 normal mapping。阅读时始终问三个问题：纹理保存什么、在哪个 shader stage 读取、它是否真的改变几何。",
+    "文件标题是 Lecture 13，但大多数页脚沿用 Lecture 15，部分素材又来自 Spring 2017 Lecture 16。教程按 33 个物理页逐一对应；页脚编号只视为讲义拼合痕迹。",
+  ],
+  outcomes: [
+    "把环境贴图写成单位球面上的方向函数，并比较球面图与 cube map 的失真和接缝",
+    "从观察向量与法线求反射方向，并在 GLSL cubemap 中完成一次查找",
+    "从 pᵈ=p+h n̂ 推导位移后的两条切线与法线，解释高度导数和 UV 尺度的影响",
+    "由三角形位置差与 UV 差求非单位切线，并说明何时保留尺度、何时正交归一化",
+    "严格区分 displacement、bump、normal mapping 对位置、轮廓、阴影、视差和成本的影响",
+    "把切线空间法线解码并变换到照明空间，说明为什么法线贴图常接近 (0,0,1)",
+    "解释三维程序纹理怎样避免 UV 展开，以及它为什么适合木材、岩石等实体材料",
+  ],
+  runningExample: {
+    title: "贯穿例子：一块带波纹高度的平面与同一张环境立方体贴图",
+    description: "基础曲面 p(u,v)=(2u, v, 0)，高度 h=0.05 sin(8πu)sin(8πv)。它的非单位切线长度不同，能暴露‘先归一化会丢 UV 尺度’的问题；同一片元再用 n、观察方向 v 计算反射 r，并查询 cube map。",
+    code: "p(u,v) = (2u, v, 0)\ntu = ∂p/∂u = (2,0,0)\ntv = ∂p/∂v = (0,1,0)\nn̂ = normalize(tu × tv) = (0,0,1)\nh(u,v) = 0.05 sin(8πu) sin(8πv)\nhu = 0.4π cos(8πu) sin(8πv)\nhv = 0.4π sin(8πu) cos(8πv)\ntdu ≈ tu + hu n̂;  tdv ≈ tv + hv n̂\nn̂d = normalize(tdu × tdv)\nr = 2 dot(n̂d,v) n̂d - v",
+  },
+  chapters: [
+    {
+      id: "textures-as-functions",
+      title: "把纹理重新定义为表面上的函数",
+      pages: "1-3",
+      purpose: "先从贴花和颜色的直觉抽象一步，为方向图、高度场、法线场与三维纹理建立统一语言。",
+      beats: [
+        beat(1, "标题页：Games 指的是对纹理机制做更一般的用途实验", "物理第 1 页只给 Games with Texture Mapping 与 Lecture 13；页脚却沿用 Lecture 15。", ["本讲不再重复 UV、双线性和 mipmap，而是追问纹理查找结果还能控制什么。把 texture 看成函数表或数据缓冲，比把它只想成‘贴在模型上的图片’更准确。", "接下来每个例子都可写成 output = texture(input)：环境贴图的 input 是方向，位移图 output 是高度，法线图 output 是三维向量。"], ["Games 表示扩展用法，不是游戏开发专题", "Lecture 13 与页脚 Lecture 15 的差异来自旧讲义复用"], { textbook: book("教材第 11 章", "11 纹理映射导言", "/book/11/", "教材开篇明确指出纹理可制作反射、照明、形状，也可存储与图片无关的数据。"), pause: "列出一张 RGB 图片之外，GPU texture 可能保存的三种数据。" }),
+        beat(2, "第一次定义：让表面属性随表面位置变化", "标题页后出现旧定义，重点仍放在 shading parameters 与 position on the surface。", ["颜色贴图、粗糙度贴图和镜面强度贴图都符合这个定义：先由着色点得到 UV，再查出参数。它把纹理从‘颜色’扩展到‘任意表面属性’，但仍把输入限制为表面位置。", "这一定义足够解释木纹和贴花，却难以自然描述反射环境，因为同一表面点会随观察方向看到不同颜色。下一页因此再次放宽。"], ["especially 表示 shading parameters 只是常见而非唯一输出", "位置变化是定义中的核心自变量"], { textbook: book("教材第 11 章", "11.4.1 控制着色参数", "/book/11/", "教材列出漫反射色、镜面色、粗糙度等都可由纹理查询控制。") }),
+        beat(3, "精炼定义：纹理映射是在表面上定义函数的一组技术", "第 2 页整段定义缩短；删除 especially shading parameters，新增 for a variety of uses。", ["这一改写是全讲钥匙：函数的值不必是颜色，也不一定只服务最终着色。高度可进入顶点阶段改变位置，方向可进入 cube map 查光照，三维点可直接驱动程序纹理。", "‘一组技术’也提醒我们，UV 图像只是实现函数的一种存储形式；解析函数、三维数组、cube map 和预计算导数都属于同一框架。"], ["第 2→3 页删除了对 shading parameter 的强调", "新增 examples of more general uses 是后 30 页路线声明"], { pause: "阶段检查前，把 texture 写成 T : domain → range，并为颜色贴图、高度图、环境图各填一次 domain/range。" }),
+      ],
+      checkpoint: "解释为什么 texture 不等于 image，并分别写出 albedo map、height map、environment map 的输入与输出。",
+    },
+    {
+      id: "reflection-and-environment-maps",
+      title: "把无限远世界压成方向函数：环境贴图与立方体贴图",
+      pages: "4-14",
+      purpose: "从镜面反射方向出发，依次比较球面全景、镜面球参数化和 cube map，最后落到 GLSL 片元查询。",
+      beats: [
+        beat(4, "闪亮感需要可辨认的环境，而不只是一个白色高光", "精炼定义后新增两颗球：真实环境照明的球含丰富反射，点光源球只有孤立高光。", ["Phong/Blinn-Phong 高光能表示一个模糊亮斑，却不能自动生成窗户、墙壁等环境结构。抛光物体之所以像镜面，是因为观察者在其上识别到周围世界。", "环境贴图用一张方向图提供‘可反射之物’，成本远低于为每个片元追踪真实场景反射。它是外观近似，不包含近处物体间的精确视差和遮挡。"], ["左球包含多个光源与场景结构", "右球只有点光源高光", "论文对照固定材质，只改变照明环境"], { textbook: book("教材第 11 章", "11.4.5 环境贴图", "/book/11/", "教材说明环境贴图把远处照明压成单位球面上的方向函数，并可直接用于镜面反射。") }),
+        beat(5, "复习反射向量：光追会沿 r 发出新射线", "两球对照切到光线追踪镜面图，并给出 r=2(n·v)n-v。", ["课件令 v 从表面指向观察者，单位法线为 n，因此镜面反射方向 r=2(n·v)n-v。法线和方向都应归一化，并位于同一坐标空间。", "GLSL reflect(I,N) 的 I 约定为指向表面的入射向量，所以若已有 outward view v，应调用 reflect(-v,n)。符号约定不同，但几何相同。"], ["n 平分 v 与 r", "图中 v、r 都从命中点向外", "公式第二行只是代数化简"], { formula: "r = 2(n·v)n - v = reflect(-v,n)", textbook: book("教材第 4 章", "4.7.4 理想镜面反射", "/book/4/", "教材从法向分量分解推导同一反射公式，并强调方向约定。") }),
+        beat(6, "关键近似：环境无限远时，颜色只依赖方向", "光追反射射线被抽象为 environment map: direction → color，并提出球面角或 cube map。", ["若环境离物体尺度足够远，从物体上不同点沿同一方向看到的内容近似相同，于是三维起点可丢弃，只保留单位方向 r。方向有两个自由度，所以能存进二维纹理集合。", "这会丢失局部反射：茶壶不会正确反射旁边的小球。环境映射适合远景和照明背景，近景交互需动态 cube map、屏幕空间反射或光追等更完整方法。"], ["infinitely far away 是近似前提", "二维来自单位球面有两个自由度", "课件预告 cube map 优于单一 theta/phi 图"], { pause: "如果相机旁有一颗近距离红球，静态环境贴图能否让茶壶正确反射它？指出被近似掉的变量。" }),
+        beat(7, "球面全景：经度横向展开，极点压缩到顶底边", "文字页换成一张带方位标注的 360° 等距柱状全景。", ["横轴环绕 East→South→West→North→East，纵轴从 straight up 到 straight down。它把球面方向映到一个矩形，左右边应首尾相接。", "代价是两极附近大量方向被挤在长边上，面积和形状失真严重；顶部和底部的每一横向位置实际上趋向同一个方向。"], ["左右两端都是 due East，说明 u 环绕", "顶部/底部重复 straight up/down，显示极点退化", "这是图像本身，没有普通课件页脚"], { textbook: book("教材第 11 章", "11.2.1 球坐标与 11.4.5", "/book/11/", "教材把经纬度映射的单条接缝与两极失真列为球面环境图的主要问题。") }),
+        beat(8, "环境贴图是球面到颜色的函数，而不是贴在茶壶上的 UV 图", "全景照片换成低分辨率环境图与反光茶壶并置。", ["茶壶每个片元先由视线与法线得到 r，再用 r 查询同一环境函数。纹理坐标并非模型预先展开的 UV，而是随观察方向动态产生。", "左图窗户形状在茶壶曲面上弯曲，是反射方向场造成的采样重排；几何并未真的包含窗户。"], ["左图是方向函数的存储", "右图的亮窗重复来自不同表面法线", "函数定义在 sphere 上，图像只是参数化"], { example: { title: "贯穿例子的方向查询", lines: ["设 n=(0,0,1), v=normalize(1,0,1)", "r=2(n·v)n-v=(-1/√2,0,1/√2)", "用 r 选择 cube face 和 UV，而不是用表面原始 (u,v)"] } }),
+        beat(9, "镜面球参数化：一张反光球照片也能编码周围方向", "茶壶例切到 Escher 镜面球与球截面几何，说明 reflection/sphere map 的来源。", ["观察正交相机中的镜面球时，图像上的每个点对应一条法线，再对应一条反射方向，因此圆盘图像可编码近乎整个环境。", "这种参数化在圆盘边界方向压缩强、采样不均匀，并依赖观察约定；它具有历史意义，但现代实时渲染更常使用 cube map。"], ["左图用半径 r 与角度 θ 关联球面点和图像半径", "右侧黑点展示镜面球中场景被压缩", "圆盘边缘附近失真最大"]),
+        beat(10, "真实环境球图：高动态范围亮源会决定材质可信度", "参数化示意换成 Paul Debevec 的三张不同室内/室外 light probe。", ["三张球图的亮窗、顶灯和色温都不同；同一个材质在这些环境下会出现不同高光、反射与整体照明。环境内容比单个 Phong 指数更能传达场所。", "若贴图保存 HDR 辐射度，它还能用于积分环境光照；若只是普通显示图像，强光被截断，主要适合视觉反射背景。"], ["亮源位置和面积在三图中不同", "球图把完整方向域压入圆盘", "此页只有样例，没有新增公式"]),
+        beat(11, "从环境图到材质：diffuse、glossy、mirror 取样范围逐渐收窄", "三张环境球换成顶部单一环境与底部三把茶壶的黑底对照。", ["左茶壶主要显示木纹/漫反射，中间加入宽而模糊的环境高光，右侧接近镜面，清楚映出酒吧。材质越粗糙，应从反射方向周围更大立体角平均环境，而不是只取一个 texel。", "课件未写标签细节，但相邻图的教学意图是固定几何和环境，只改变材质响应。单次 textureCube(r) 是理想镜面近似；粗糙反射需要预过滤环境图或多样本积分。"], ["顶部球图是三把茶壶共享环境", "右茶壶可辨识背景结构最强", "左→右反射清晰度增加而几何不变"]),
+        beat(12, "Cube map：以绝对值最大分量选面，再用另外两分量求 UV", "材质对照切到球面向立方体投射与 +x/right face 计算图。", ["给方向 d=(x,y,z)，最大绝对分量决定射线先撞到哪一面。例如 x>0 且 |x| 最大时选 +X 面，再把 y/x、z/x 映到 [0,1]²。", "六个面降低球面极点失真且计算便宜，但产生十二条面边接缝。相邻面方向与图像朝向必须遵守同一约定，过滤时也要正确跨边。"], ["right face 条件是 x>|y| 且 x>|z|", "方向长度不影响最终面与坐标", "(0,0)/(1,1) 标注给出该页选定朝向"], { formula: "+X face: u = 0.5(-z/x + 1), v = 0.5(-y/x + 1)（具体符号依 API 面朝向约定）", textbook: book("教材第 11 章", "11.2.1 立方体贴图", "/book/11/", "教材给出最大分量选面、单次除法投影，并强调六面 UV 朝向必须标准化。") }),
+        beat(13, "六面展开：采集图必须与 GPU 的面顺序和朝向完全一致", "几何 cube 示意换成圣彼得大教堂全景十字布局，右上角演示展开图如何折成立方体。", ["十字图不是普通一张 2D 纹理贴满模型，而是六个方形 face 的打包展示。上传时要拆成 +X/-X/+Y/-Y/+Z/-Z，并按 API 约定旋转。", "测试 cube map 最可靠的方法是给每面不同颜色和带方向的文字；仅用自然照片时，翻转和交换常在接缝处才暴露。"], ["顶部与底部各一面，中间横排四面", "右上三步图展示 cross→fold→cube", "同一空间在面边上必须连续"]),
+        beat(14, "GLSL 反射贴图：片元阶段求 r，samplerCube 完成选面和采样", "图像页收束为实现清单：surface normal、view direction、reflect() 与 textureCube()。", ["顶点阶段传递世界或观察空间位置与法线；片元阶段归一化 n、v，求 r=reflect(-v,n)，再用 textureCube(environment,r) 取色。所有方向与 cube map 朝向必须位于同一坐标空间。", "WebGL 1 使用 textureCube；现代 GLSL 常统一为 texture。内置 reflect 只负责向量反射，面选择、UV 和过滤由 cubemap sampler 负责。"], ["明确标为 fragment operation", "输入是三维 reflection vector 而非二维 UV", "built-in reflect 可避免手写符号错误"], { example: { title: "WebGL 1 片元核心", lines: ["vec3 N = normalize(vNormalWorld);", "vec3 V = normalize(uCameraWorld - vPositionWorld);", "vec3 R = reflect(-V, N);", "vec3 reflected = textureCube(uEnvironment, R).rgb;"] }, pause: "阶段检查前说明：为什么反射贴图不能在顶点只算三次后直接插值最终颜色？" }),
+      ],
+      checkpoint: "从 v、n 推出 r；写出 cube face 选择规则；再解释环境无限远、球面参数化与单次 cubemap 查找分别引入什么近似。",
+    },
+    {
+      id: "displacement-mapping",
+      title: "位移贴图：让高度函数真正改变几何与轮廓",
+      pages: "15-26",
+      purpose: "从视觉对照进入 pᵈ=p+h n̂，并保留 UV 参数化尺度推导新切线、法线与顶点阶段实现。",
+      beats: [
+        beat(15, "第一组控制实验：同一球的几何基面与真实位移结果", "反射实现页切到黑底两球；左球光滑，右球轮廓和内部都产生真实凹凸。", ["右球不只是亮暗变化：外轮廓也被高度推开，说明顶点位置发生了改变。它能产生真实遮挡、视差和阴影，是 displacement 与后续 bump/normal 的根本区别。", "此帧只出现 Geometry 与 Displacement mapping，下一组页面会补齐高度图和完整生产结果。"], ["右球边缘不再是完美圆", "凹凸会影响几何深度", "两球材质颜色相同以隔离形状差异"]),
+        beat(16, "高度图到地形：灰度标量沿基础法线抬升平面", "两球对照换成平面、灰度图和山地三步图。", ["基础平面提供 p(u,v) 与法线，灰度图提供 h(u,v)，结果按 pᵈ=p+s h n̂ 移动。比例 s 决定物理高度，不能让 0-1 灰度未经标定直接等同世界单位。", "网格必须足够密；纹理中比顶点间距更高频的山峰没有顶点可移动，会被漏采或折成粗糙台阶。"], ["橙色箭头表示 texture 驱动 geometry", "右侧轮廓真实改变", "这张图把 height field 与 albedo image 区分开"]),
+        beat(17, "生产案例第 1 帧：低模火车 + 手绘位移图 → 雕刻细节", "抽象地形切到火车基础表面、位移图局部和灰色 displaced surface 三图。", ["位移图中的亮色区域把编号 521 和微表面推出来；基础网格负责大轮廓，高度图负责中小尺度几何。这是将建模复杂度从顶点编辑转成二维绘制。", "位移后的表面仍需重算法线，否则新增凸字会保留基础法线而看不出真实转折。第 20-25 页会专门处理。"], ["base surface 没有 521", "height map 中能辨认倒置/局部编号", "displaced surface 已出现凸字与细微粗糙"]),
+        beat(18, "生产案例第 2 帧：材质、照明与位移组合成最终图", "第 17 页三联过程图换成完整彩色火车渲染；没有文字。", ["这页不是新算法，而是验证位移只负责几何细节，最终颜色、粗糙度、反射和景深仍来自其他材质与相机过程。真实资产通常并行使用多张贴图。", "将 17→18 看作输入分解到合成结果：若轮廓和阴影细节存在，说明位移进入几何；若只有颜色编号，则可能只是 decal。"], ["521 在最终红色车身上有颜色与形状", "轮胎、金属和木轨使用不同材质响应", "页内只有作品水印，没有课件标题"]),
+        beat(19, "位移的实现合同：height、smooth normal、UV 与足够密的三角剖分", "最终图切回文字，首次明确 displacement 是 vertex operation。", ["顶点着色器按 UV 取高度，将位置沿平滑法线移动，并输出新位置。因为移动的是顶点，面内部仍由三角形线性连接；没有足够细分就无法表达高频高度。", "仅移动位置还不够，新表面法线取决于高度梯度。若仍用原法线，轮廓变了但内部光照像未变形表面。"], ["dense triangulation 是几何采样率要求", "vertex operation 的理由写作 because it moves geometry", "最后一步明确要求 new normal"]),
+        beat(20, "法线变化首先由高度导数决定：常量高度不倾斜，变化高度会倾斜", "位移清单换成两行剖面：常量 h 与有凸起的 h 对应位移曲面。", ["若 h 在邻域恒定，所有点沿各自基础法线移动同样距离；平面不改变方向，曲面近似平行偏移，法线基本保持。若 h 有梯度，沿表面移动会同时改变高度，切线获得法向分量，法线随之倾斜。", "法线由 h 的值间接决定，但真正控制倾斜的是 ∂h/∂u、∂h/∂v。高而宽的缓坡可比低而尖的划痕倾斜更小。"], ["上图 constant height 对应 normals unchanged", "下图 bump 两侧法线朝相反方向倾斜", "峰顶梯度为零处法线重新接近基础方向"]),
+        beat(21, "同一高度函数因 UV 走速不同而产生不同物理斜率", "第 20 页常量/变化对照换成同一 h 在 u 缓慢变化与快速变化的两种参数化。", ["若纹理 u 在曲面上走得慢，同样从 u=0 到 1 跨越更长物理距离，单位世界长度的高度变化小，法线倾斜少；u 走得快则同一曲线压进短距离，斜率变大。", "因此不能只看高度图像求世界法线；必须知道纹理坐标相对几何的导数，也就是带长度和方向的切线 tu、tv。"], ["左侧 height function 完全相同", "上图 u varying slowly / normals tilt less", "下图 u varying quickly / normals tilt more"], { pause: "一张砖缝高度图在 UV 放大 4 倍后，物理表面上的沟槽频率和法线斜率会怎样变化？" }),
+        beat(22, "数学起点：参数曲面偏导给出两条切线，叉积给出法线", "参数化速度图切到 p:R²→R³、h:R²→R 的定义和 tu=∂p/∂u、tv=∂p/∂v。", ["tu、tv 同时编码 UV 在世界中的方向与单位 UV 对应的物理长度；n=tu×tv 垂直于二者。位移距离要沿单位法线 n̂，因此这里才对 n 归一化。", "课件末行把 n̂ 写成 t̂u×t̂v，只有两条单位切线正交时结果才已经是单位向量。一般参数化应写 n̂=normalize(tu×tv)，不要先各自归一化后省略最终 normalize。"], ["tu/tv 是非单位偏导", "n 的长度还包含参数面积缩放", "一般情况下切线可能不正交"], { formula: "tu=∂p/∂u, tv=∂p/∂v, n̂=normalize(tu×tv)", textbook: book("教材第 11 章", "11.4.2-11.4.3 切线空间与位移", "/book/11/", "教材用纹理坐标方向建立切线基，并强调位移与法线变化依赖高度场导数。") }),
+        beat(23, "对位移曲面求导：高度梯度给基础切线添加法向分量", "第 22 页基础定义推进到 pᵈ=p+h n̂，并对 u、v 分别求偏导。", ["完整乘积求导包含 tu + hu n̂ + h ∂n̂/∂u。课件在位移相对基础曲率较小时忽略最后一项，得到 tdu≈tu+hu n̂、tdv≈tv+hv n̂。", "这里必须保留原始非单位 tu、tv：它们把‘每单位 UV 的高度变化’与‘每单位 UV 的空间位移’放在同一尺度。先归一化会让拉伸 UV 与未拉伸 UV 得到错误的同样法线。"], ["unit n̂ 使 h 具有距离单位", "被丢弃项描述基础法线沿曲面的变化", "旁注明确 non-unit tangents depend on their length"], { formula: "pᵈ=p+h n̂;  tᵈu≈tu+h_u n̂;  tᵈv≈tv+h_v n̂" }),
+        beat(24, "最后一步：新切线叉积并归一化，得到位移表面法线", "第 23 页长推导收束为 nᵈ=tᵈu×tᵈv 与 n̂ᵈ=nᵈ/||nᵈ||。", ["叉积同时合并 u、v 两方向高度斜率；顺序必须与基础网格绕序/UV 朝向一致，否则法线翻面。片元着色最终使用 n̂ᵈ，而几何位置使用 pᵈ。", "在贯穿平面 u=v=1/16 时，hu=hv=0.4π，tdu=(2,0,0.4π)、tdv=(0,1,0.4π)，叉积约 (-0.4π,-0.8π,2)，归一化后明显偏离 +z。"], ["先 cross 后 normalize", "只有两条新切线都正确，新法线才正确", "公式页没有新增近似，完成上一页推导"], { example: { title: "贯穿例子的一个采样点", lines: ["u=v=1/16 → sin(π/2)=1, cos(π/2)=0，所以此点 hu=hv=0；峰顶法线仍为 +z", "改取 u=0,v=1/16 → hu=0.4π, hv=0", "tdu=(2,0,0.4π), tdv=(0,1,0)", "normalize(tdu×tdv)=normalize(-0.4π,0,2)"] } }),
+        beat(25, "把推导翻译成 GPU 数据流：高度与导数在顶点阶段完成", "纯公式页切到 geometry inputs、vertex stage 与 fragment stage 清单。", ["每顶点携带非单位 u/v 切线，height field 作为纹理；顶点阶段查 h、以有限差分或预存通道取得 hu/hv，移动位置并构造 n̂ᵈ。片元阶段只插值新法线并算光照。", "把 h、hu、hv 预存三通道可减少 shader 采样，但需保证离线导数的 texel 尺度、环绕与运行时一致。实时有限差分则需要相邻多次查样。"], ["u/v tangents 明确为 vertex attributes", "高度+两个导数可打包 3-channel", "fragment stage just compute shading"]),
+        beat(26, "三角形切线来自 UV→位置的唯一仿射映射", "实现清单最后追问 tangent 从哪里来，并区分 displacement 与 normal-map 所需的基。", ["对三角形 e1=p1-p0、e2=p2-p0，UV 差组成 2×2 矩阵；其逆把 e1/e2 分解为 tu、tv。UV 退化或面积接近零时矩阵不可逆，必须修复 UV 或提供回退基。", "位移推导要保留切线的长度和非正交性；法线贴图只需表达局部方向，常把 T、B、N 正交归一化成 ONB。两种用途不能共用一次无条件 normalize。"], ["三角形内映射是线性的", "three 2×2 systems 等价于一次矩阵逆作用到 xyz 三分量", "页面明确 displacement 留非单位/非正交，other uses 可做 ONB"], { formula: "[tu tv] = [e1 e2] · [[Δu1 Δv1],[Δu2 Δv2]]⁻¹", pause: "阶段检查前说明：若两个顶点有完全相同 UV，切线求解会出现什么数值问题？" }),
+      ],
+      checkpoint: "从 pᵈ=p+h n̂ 独立推导 tᵈu、tᵈv、n̂ᵈ；解释 h、梯度、UV 走速、切线长度与网格密度分别控制什么。",
+    },
+    {
+      id: "bump-and-normal-mapping",
+      title: "只保留外观中最重要的部分：凹凸贴图与法线贴图",
+      pages: "27-32",
+      purpose: "以位移为参照，逐步拿掉位置移动、稠密网格和在线求导，精确看清两种高效着色近似的能力边界。",
+      beats: [
+        beat(27, "Bump mapping 的历史视觉证明：光滑球轮廓内可以出现橘皮凹凸", "切线计算页换成 Blinn 1978 的橙色球与手绘黑白 bump function。", ["球的外轮廓仍平滑，但高光边缘和表面亮暗被高度导数扰动，视觉系统据此推断出凹凸。Blinn 的例子说明不移动几何也能产生强烈微表面感觉。", "左下黑白图不是直接颜色，而是高度函数；真正进入光照的是从其局部变化推导出的法线。"], ["外轮廓没有随橘皮起伏", "高光内部出现碎裂细节", "手绘黑白输入与输出颜色无直接对应"]),
+        beat(28, "从 displacement 做近似：保留法线变化，丢掉位置变化", "历史图切到成本分析，正式定义 bump 是 fragment operation。", ["小位移对远处像素最显著的贡献常是法线和高光变化；真实几何位移、轮廓与视差较难察觉。bump mapping 因而沿用第 23-24 页的新法线计算，但继续光栅化基础表面。", "它不需要稠密三角化，因为高度在片元频率采样；代价是不会改变 silhouette、深度、真实自遮挡或投射阴影。课件的 looks just like 应理解为内部局部着色近似，而非所有视角完全等价。"], ["不再移动 surface", "计算从 vertex 移到 fragment", "dense tessellation 的成本被删除"]),
+        beat(29, "三球完整对照：内部着色接近，轮廓只有 displacement 改变", "第 15 页两球对照扩为 Geometry、Bump、Displacement 三球。", ["中间 bump 与右侧 displacement 的内部凹凸光照相近；但中间球仍保持圆形外轮廓，右球轮廓真实起伏。这是判断技术类别的最快视觉测试。", "在相机移动时，bump 细节也没有真实视差；大高度、切线角度或近距离特写会更快暴露近似。"], ["中间与右侧表面亮暗相似", "只有右侧边缘凹凸", "三球基础颜色与光照统一"]),
+        beat(30, "Bump 的 GPU 合同：顶点只传位置/切线，片元求高度导数和着色法线", "三球对照切到分阶段清单；与第 25 页 displacement 数据流形成控制对照。", ["几何输入仍有非单位切线和 height texture，但不再要求密网格。顶点阶段只变换并传递位置/切线；片元阶段差分 h，构造扰动切线和 n̂ᵈ，再用它计算光照。", "若离线把 hu、hv 存成两通道，可省片元中的邻域查找；这正是从 bump 走向 normal map 的中间形式。"], ["no dense triangulation needed", "position 没有 displaced 步骤", "2-channel texture 保存两个导数而非高度本身"]),
+        beat(31, "Normal mapping：500 个三角形借助烘焙法线恢复 400 万面细节", "bump 清单换成高模、500 面低模、低模+normal map 三联对照。", ["左侧高模提供目标细节，中间低模保留大轮廓，右侧把高模表面方向烘焙到纹理后恢复内部褶皱感。法线贴图直接存结果向量，不需运行时由高度求导。", "右图轮廓仍与 500 面低模相同，深凹结构也不会产生真实遮挡；normal map 转移的是着色法线场，不是几何。"], ["4M triangles 降到 500 triangles", "中间线框暴露基础轮廓", "右图内部细节接近高模但外边界仍低模"]),
+        beat(32, "切线空间法线：一次三通道查样，经 TBN 变回照明空间", "视觉对照收束为 normal mapping 的输入和几何逻辑。", ["纹理 RGB 通常编码切线空间向量，例如 n_t=normalize(2*rgb-1)。以单位切线 T、bitangent B、平滑法线 N 组成 TBN，世界法线为 normalize(TBN·n_t)。", "切线空间随表面和动画一起变形，平坦区域都接近 (0,0,1)，因此同一法线纹理可在不同朝向复用。UV 镜像、接缝和 TBN handedness 若处理错误，会让凹凸突然翻转。"], ["3 channels 表示 normal field", "no finite differencing needed", "single lookup 替代高度邻域查样", "页面措辞 transform into space，实际使用时是从 tangent space 变到照明空间"], { formula: "n_t=normalize(2·rgb-1);  n_world=normalize([T B N] n_t)", textbook: book("教材第 11 章", "11.4.2 法线贴图与凹凸贴图", "/book/11/", "教材说明对象空间法线难以复用，切线空间让大多数向量靠近 (0,0,1)，并解释法线图可由高模或高度导数产生。"), pause: "阶段检查前做表格：displacement/bump/normal 是否改位置、是否需密网格、纹理通道、求导位置、是否改轮廓。" }),
+      ],
+      checkpoint: "不用‘看起来差不多’作答：从位置、法线来源、执行阶段、网格密度、轮廓、视差、阴影七项严格比较 displacement、bump 与 normal mapping。",
+    },
+    {
+      id: "three-dimensional-textures",
+      title: "跳过 UV 展开：直接在三维空间中定义实体纹理",
+      pages: "33",
+      purpose: "把全讲的函数观念推广到 T(u,v,w)，理解实体材料、程序纹理与内存成本之间的选择。",
+      beats: [
+        beat(33, "3D texture：在表面点的三维坐标直接求值", "法线贴图清单后，最后一页把纹理域从 (u,v) 扩为 (u,v,w)，并用切开的岩石示例结束。", ["三维纹理在整个空间定义颜色/参数，表面只是取其中的点。因此切开大理石或木头时，新断面自然延续内部纹理，不需要为每个表面重新展开 UV，也没有二维接缝。", "直接存 N³ 体素成本很高，所以实体材料常由 noise、turbulence、条纹等程序函数生成。代价从纹理内存转为计算，并需处理对象空间/世界空间选择和过滤抗混叠。", "这一页把第 3 页的精炼定义闭环：纹理映射不是把二维图片贴到物体，而是选择一个域、定义函数，并在渲染所需的位置高效采样。"], ["输入明确是 (u,v,w)", "pickaxe/rock 暗示切开后内部花纹连续", "often defined procedurally 指向教材后续噪声与湍流"], { textbook: book("教材第 11 章", "11.5 程序化 3D 纹理", "/book/11/", "教材说明三维函数避免曲面参数化扭曲，适合固体材料，但 N³ 存储昂贵，因此常用 Perlin noise 与 turbulence 程序求值。"), example: { title: "一个最小实体条纹", lines: ["q = objectSpacePosition", "t = 0.5 + 0.5 sin(20 q.x + 3 noise(q))", "color = mix(darkWood, lightWood, t)", "物体切开或增加新表面时，仍在同一 q 空间采样"] }, pause: "如果把 objectSpacePosition 换成 worldSpacePosition，移动物体时纹理会跟着物体走，还是像穿过固定雾场？解释原因。" }),
+      ],
+      checkpoint: "解释三维纹理如何消除 UV 接缝、为什么存储昂贵、程序噪声怎样换取内存，以及对象空间与世界空间会造成什么动画差异。",
+    },
+  ],
+  synthesis: [
+    "函数层：颜色图是 surface position→color；环境图是 direction→radiance；高度图是 UV→distance；法线图是 UV→direction；实体纹理是 3D point→material data。",
+    "反射层：用同一空间中的 v、n 得到 r，再查询无限远环境；它恢复远景反射，但忽略近物体视差和精确遮挡。",
+    "参数层：球面图接缝少但极点失真大；cube map 用最大分量选六面，失真更均匀但面边更多。",
+    "位移层：pᵈ=p+h n̂ 真正改变位置；高度梯度给切线添加法向分量，叉积后归一化得到新法线。",
+    "尺度层：UV 的方向与走速由非单位 tu/tv 保存；位移推导不能先把它们归一化，否则高度的物理斜率错误。",
+    "近似层：bump 保留高度导数造成的法线变化；normal map 直接存烘焙法线；二者都不改变轮廓、深度和真实视差。",
+    "空间层：切线空间 TBN 让法线贴图随表面方向复用；镜像 UV 与 handedness 必须一致处理。",
+    "实体层：三维程序纹理用计算换 N³ 存储与 UV 展开，特别适合木材、岩石和大理石等切开后仍连续的材料。",
+  ],
+  finalPractice: "实现 SurfaceFunctionLab：同一模型可切换 albedo、reflection、displacement、bump、normal、3D procedural 六种模式，并并排显示纹理输入、shader stage、位置是否改变、实际法线、几何轮廓和最终颜色。必须提供环境旋转、粗糙度、height scale、tessellation density、UV scale、finite-difference step、TBN handedness 和 object/world texture space 控件。测试至少覆盖：reflect 的方向约定、cube 六面接缝、低密网格漏失位移峰、同一 h 在 UV 慢/快参数化下法线不同、先归一化切线导致错误、bump/normal 不改变 silhouette、镜像 UV 法线翻转，以及移动模型时对象/世界三维纹理的差异。",
+};
+
 export const detailedTutorials: Record<string, DetailedLectureTutorial> = {
   [triangleMeshesOne.pdf]: triangleMeshesOne,
   [triangleMeshesTwo.pdf]: triangleMeshesTwo,
@@ -2658,6 +2775,7 @@ export const detailedTutorials: Record<string, DetailedLectureTutorial> = {
   [rasterization.pdf]: rasterization,
   [pipeline.pdf]: pipeline,
   [openGlGlsl.pdf]: openGlGlsl,
+  [textureTechniques.pdf]: textureTechniques,
 };
 
 export function getDetailedTutorialForPdf(pdf?: string) {

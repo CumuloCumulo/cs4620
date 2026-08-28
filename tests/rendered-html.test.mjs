@@ -290,6 +290,27 @@ test("renders all 14 OpenGL and GLSL pages with the complete host-to-GPU data pa
   assert.equal(new Set(html.match(/lecture-slides\/12opengl\/page-\d{3}\.webp/g)).size, 14);
 });
 
+test("renders all 33 advanced texture pages from environment lookup through solid textures", async () => {
+  const response = await render("/part/5/texture-techniques");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /当纹理不再只是表面颜色时/);
+  assert.match(html, /33(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：一块带波纹高度的平面与同一张环境立方体贴图/);
+  assert.match(html, /左右两端都是 due East/);
+  assert.match(html, /diffuse、glossy、mirror/);
+  assert.match(html, /最大绝对分量决定/);
+  assert.match(html, /生产案例第 2 帧/);
+  assert.match(html, /课件末行把 n̂ 写成 t̂u×t̂v/);
+  assert.match(html, /pᵈ=p\+h n̂/);
+  assert.match(html, /只有右侧边缘凹凸/);
+  assert.match(html, /n_world=normalize/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?5/);
+  assert.match(html, /lecture-slides\/13textures\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/13textures\/page-033\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/13textures\/page-\d{3}\.webp/g)).size, 33);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
