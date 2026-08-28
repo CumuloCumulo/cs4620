@@ -205,6 +205,27 @@ test("renders all 83 transformation pages and preserves every animation frame an
   assert.equal(new Set(html.match(/lecture-slides\/08transforms\/page-\d{3}\.webp/g)).size, 83);
 });
 
+test("renders all 33 viewing pages and explains the complete camera-to-screen chain page by page", async () => {
+  const response = await render("/part/3/viewing");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /怎样把一个物体局部坐标中的三维点/);
+  assert.match(html, /33(?:<!-- -->)? 个物理页/);
+  assert.match(html, /贯穿例子：把世界点投到 800×600 屏幕/);
+  assert.match(html, /无文字铁路照片：用真实消失点证明仿射投影不够/);
+  assert.match(html, /页内只有摄影署名 Ray Verrier/);
+  assert.match(html, /正文与第 5 页像素级相同/);
+  assert.match(html, /正文内容区域像素差为 0/);
+  assert.match(html, /z'\(z\)=\(a z\+b\)\/\(-z\)/);
+  assert.match(html, /near→\+1、far→-1/);
+  assert.match(html, /x_ndc=0\.2, y_ndc=0\.2\/0\.75≈0\.2667/);
+  assert.match(html, /p_ndc = p_clip\.xyz \/ p_clip\.w/);
+  assert.match(html, /阶段检查 (?:<!-- -->)?5/);
+  assert.match(html, /lecture-slides\/09viewing\/page-001\.webp/);
+  assert.match(html, /lecture-slides\/09viewing\/page-033\.webp/);
+  assert.equal(new Set(html.match(/lecture-slides\/09viewing\/page-\d{3}\.webp/g)).size, 33);
+});
+
 test("indexes the textbook knowledge points in course search", async () => {
   const searchPage = await readFile(new URL("../app/search/page.tsx", import.meta.url), "utf8");
   const textbookData = await readFile(new URL("../app/textbook-data.ts", import.meta.url), "utf8");
